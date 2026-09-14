@@ -317,6 +317,23 @@ details.acc .acc-b{padding:2px 13px 13px}
     font-weight:650;color:var(--ink-3);text-transform:uppercase;margin-bottom:2px}
   .tbl td[data-l]{margin-top:6px}
 }
+
+/* ============ 脱敏演示声明 ============ */
+.demo-badge{
+  display:inline-flex;align-items:center;gap:3px;margin-top:3px;
+  padding:1px 6px;border-radius:999px;font-size:9px;font-weight:650;letter-spacing:.4px;
+  color:var(--warn);background:var(--warn-bg);border:1px solid var(--warn-bd);white-space:nowrap;
+}
+.demo-banner{
+  display:flex;align-items:flex-start;gap:10px;
+  margin:0 0 12px;padding:9px 13px;border-radius:var(--r-s);
+  background:var(--warn-bg);border:1px solid var(--warn-bd);
+}
+.demo-banner .dm-ico{flex:0 0 auto;width:15px;height:15px;margin-top:1px;stroke:var(--warn);fill:none;
+  stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.demo-banner .dm-txt{flex:1;min-width:0;font-size:12px;line-height:1.65;color:var(--ink-2)}
+.demo-banner b{color:var(--warn);font-weight:650}
+@media(max-width:760px){ .demo-banner{padding:8px 11px} .demo-banner .dm-txt{font-size:11.5px} }
 </style>
 </head>
 <body data-theme="dark">
@@ -330,6 +347,7 @@ details.acc .acc-b{padding:2px 13px 13px}
       <div>
         <h1>AI 转型作战台</h1>
         <p>林知远 · 杭州 · 目标 8–11K</p>
+        <span class="demo-badge">脱敏演示版</span>
       </div>
     </div>
     <nav class="nav" id="nav"></nav>
@@ -349,6 +367,14 @@ details.acc .acc-b{padding:2px 13px 13px}
 
   <!-- ==================== 主区 ==================== -->
   <div class="main">
+    <div class="demo-banner">
+      <svg class="dm-ico" viewBox="0 0 24 24"><path d="M12 9v4"/><path d="M12 17h.01"/><circle cx="12" cy="12" r="9"/></svg>
+      <div class="dm-txt">
+        <b>脱敏演示版 · 本站所有信息均为虚构示例。</b>
+        页面中的人名「林知远」、城市、目标薪资、量化数字、学习计划与JD数据都是为了<strong>演示这个工具怎么用</strong>而编造的示例数据，
+        不代表作者本人的真实背景。 Fork 后请替换成你自己的内容 —— 所有数据只存在你自己的浏览器里，不会上传。
+      </div>
+    </div>
     <header class="topbar">
       <div>
         <h2 id="pageTitle">今日要处理</h2>
@@ -385,6 +411,48 @@ const DEFAULT_DATA = {
 
 let state = JSON.parse(JSON.stringify(DEFAULT_DATA));
 
+/* =====================================================================
+   增量迁移（2026-09-14）
+   浏览器里已存的数据不会因为代码更新而自动变化，这里显式补齐：
+     ① 新增条目 → 追加（不覆盖用户已勾选的 done / status）
+     ② 修订条目 → 按 id 覆盖文案字段，但保留用户的勾选状态
+   ===================================================================== */
+const RES_VERSION  = 2;   // 资源包版本
+const GOAL_VERSION = 2;   // 目标包版本
+
+/* 按 id 修订：只改展示文案，不改完成状态 */
+const RES_UPDATES = {
+  r6:  {title:'chatchat-space/Langchain-Chatchat（⚠️ 停更，只读思路）'},
+  r17: {title:'vibrantlabsai/ragas（原 explodinggradients/ragas）', by:'RAGAS · ⚠️ 已改名易手', url:'https://github.com/vibrantlabsai/ragas'}
+};
+
+function migrate(){
+  let dirty = false;
+
+  /* 目标：追加新增 g13 */
+  if(!state.goalVersion || state.goalVersion < GOAL_VERSION){
+    const has = new Set((state.targets||[]).map(x=>x.id));
+    GOALS_EXTRA_SEED().forEach(t=>{ if(!has.has(t.id)) state.targets.push(t); });
+    state.goalVersion = GOAL_VERSION; dirty = true;
+  }
+
+  /* 资源：修订 + 追加 */
+  if(!state.resVersion || state.resVersion < RES_VERSION){
+    const seed = RES_SEED();
+    const has  = new Set((state.resources||[]).map(x=>x.id));
+    if(state.resources && state.resources.length){
+      state.resources.forEach(r=>{
+        const u = RES_UPDATES[r.id];
+        if(u) Object.assign(r, u);          // 保留 done，只换文案
+      });
+    }
+    seed.forEach(r=>{ if(!has.has(r.id)) state.resources.push(r); });
+    state.resVersion = RES_VERSION; dirty = true;
+  }
+
+  if(dirty) saveData();
+}
+
 function loadData(){
   try{
     const raw = localStorage.getItem(LS_KEY);
@@ -395,6 +463,7 @@ function loadData(){
     /* 版本迁移：老数据补齐新增模块，绝不覆盖已有内容 */
     if(!state.sprint || !state.sprint.length) state.sprint = SPRINT_SEED();
     if(!state.jdmap || !state.jdmap.length) state.jdmap = JDMAP_SEED();
+    migrate();
   }catch(e){
     state = seedData();
   }
@@ -475,6 +544,8 @@ function seedData(){
   ];
 
   d.resources = RES_SEED();
+  GOALS_EXTRA_SEED().forEach(t=>d.targets.push(t));
+  d.resVersion = RES_VERSION; d.goalVersion = GOAL_VERSION;
   d.sprint = SPRINT_SEED();
   d.jdmap = JDMAP_SEED();
 
@@ -509,7 +580,7 @@ function RES_SEED(){
     {id:'r5', stage:'S1 筑基', pri:'P2', kind:'GitHub', type:'仓库', title:'redis/redis', by:'Redis 官方', url:'https://github.com/redis/redis', why:'P2 了解层。只需跑通 docker run redis + 一个缓存/限流 demo，不啃源码。', hours:'2h', done:false},
 
     /* ---- S2 检索：RAG 全链路 ---- */
-    {id:'r6', stage:'S2 检索', pri:'P0', kind:'GitHub', type:'仓库', title:'chatchat-space/Langchain-Chatchat', by:'国内 RAG 标杆项目', url:'https://github.com/chatchat-space/Langchain-Chatchat', why:'中文 RAG 领域最值得读的开源实现。重点读 document_loader / text_splitter / vectorstore 三块，你的 docx 标准化经验在这里能直接迁移。', hours:'6h', done:false},
+    {id:'r6', stage:'S2 检索', pri:'P0', kind:'GitHub', type:'仓库', title:'chatchat-space/Langchain-Chatchat', by:'国内 RAG 标杆项目', url:'https://github.com/chatchat-space/Langchain-Chatchat', why:'⚠️ 降权：该仓库最后提交停在 2025-11-10，已停更约 10 个月，技术栈停留在 LangChain 0.3 时代——别照着抄代码。只读它的「中文文档如何切分与溯源」思路即可，工程参考改看 RAGFlow。', hours:'6h', done:false},
     {id:'r7', stage:'S2 检索', pri:'P0', kind:'GitHub', type:'仓库', title:'chroma-core/chroma', by:'Chroma 官方', url:'https://github.com/chroma-core/chroma', why:'向量库选它而不是 Milvus——轻量、pip 装完即用、单机够，与你「零成本交付」定位一致。看 README 的 quickstart + persistent client。', hours:'3h', done:false},
     {id:'r8', stage:'S2 检索', pri:'P0', kind:'B站', type:'视频', title:'RAG 检索增强生成实战（LangChain + 向量库）', by:'搜索关键词：RAG 实战 LangChain', url:'https://search.bilibili.com/all?keyword=RAG%20%E5%AE%9E%E6%88%98%20LangChain', why:'必须看「分块策略对比」和「混合检索」两节——这是简历里 S2 两个目标（G3/G4）的直接来源。', hours:'8h', done:false},
     {id:'r9', stage:'S2 检索', pri:'P0', kind:'GitHub', type:'仓库', title:'infiniflow/ragflow', by:'RAGFlow', url:'https://github.com/infiniflow/ragflow', why:'看它的 chunk 可视化与混合检索打分实现。你口述「分块实验」时能引用真实参数（chunk_size / overlap / top_k）。', hours:'4h', done:false},
@@ -524,12 +595,33 @@ function RES_SEED(){
     {id:'r16',stage:'S3 Agent', pri:'P1', kind:'GitHub', type:'仓库', title:'openai/openai-cookbook', by:'OpenAI 官方', url:'https://github.com/openai/openai-cookbook', why:'工具调用、结构化输出、评测的标准范例集。挑 RAG 和 function-calling 两章精读。', hours:'3h', done:false},
 
     /* ---- S4 收尾：评测 / 作品集 ---- */
-    {id:'r17',stage:'S4 收尾', pri:'P1', kind:'GitHub', type:'仓库', title:'explodinggradients/ragas', by:'RAGAS', url:'https://github.com/explodinggradients/ragas', why:'RAG 评测事实标准。跑通 faithfulness / answer_relevancy 两个指标，你就能说「我做过 RAG 量化评测」——90% 转行者说不出来。', hours:'4h', done:false},
+    {id:'r17',stage:'S4 收尾', pri:'P1', kind:'GitHub', type:'仓库', title:'vibrantlabsai/ragas（原 explodinggradients/ragas）', by:'RAGAS · ⚠️ 已改名易手', url:'https://github.com/vibrantlabsai/ragas', why:'⚠️ 2026-09 核验：仓库已迁移至 vibrantlabsai 并停更 7 个月。指标定义（faithfulness / answer_relevancy）仍值得了解，但实际评测请用 r31 的 promptfoo。', hours:'1h', done:false},
     {id:'r18',stage:'S4 收尾', pri:'P0', kind:'GitHub', type:'仓库', title:'ai-engineering-hub（免费 AI 工程实战项目集）', by:'GitHub 搜索：rag production ready', url:'https://github.com/search?q=rag+production+ready&type=repositories', why:'找一个 star 500+、有完整 README/架构图的 RAG 项目作为你作品集的「结构参照」，学它怎么写 README、画架构图。', hours:'3h', done:false},
     {id:'r19',stage:'S4 收尾', pri:'P0', kind:'文档', type:'规范', title:'GitHub README + LICENSE 规范（作品集门面）', by:'搜索关键词：awesome-readme', url:'https://github.com/matiassingers/awesome-readme', why:'你的短板不是技术是「不会包装」。作品集仓库的 README 是第一印象，照着优秀样例改，比多写 200 行代码有用。', hours:'2h', done:false},
 
     /* ---- 口述 / 面试 ---- */
-    {id:'r20',stage:'贯穿', pri:'P0', kind:'B站', type:'视频', title:'AI 应用开发岗面试真题（RAG/Agent 高频问题）', by:'搜索关键词：RAG 面试题 2025', url:'https://search.bilibili.com/all?keyword=RAG%20%E9%9D%A2%E8%AF%95%E9%A2%98', why:'你最大的风险是「简历写了但答不上」。用面试题反查学习清单，比盲学高效得多。', hours:'3h', done:false}
+    {id:'r20',stage:'贯穿', pri:'P0', kind:'B站', type:'视频', title:'AI 应用开发岗面试真题（RAG/Agent 高频问题）', by:'搜索关键词：RAG 面试题 2025', url:'https://search.bilibili.com/all?keyword=RAG%20%E9%9D%A2%E8%AF%95%E9%A2%98', why:'你最大的风险是「简历写了但答不上」。用面试题反查学习清单，比盲学高效得多。', hours:'3h', done:false},
+    {id:'r21',stage:'S2 检索', pri:'P0', kind:'B站', type:'视频', title:'黑马 · 大模型 RAG 与 Agent 智能体项目实战', by:'黑马程序员 · 2026-01-21', url:'https://www.bilibili.com/video/BV1yjz5BLEoY', why:'★ 首选主线课。2026 年新课，基于主流 LangChain 技术做企业级项目实战，一套覆盖 S2 检索 + S3 Agent 两个阶段。跟做完，G3/G4 两个硬指标就都落地了。', hours:'15h', done:false},
+    {id:'r22',stage:'S3 Agent', pri:'P0', kind:'B站', type:'视频', title:'黑马 · 2026 最新 LangChain + LangGraph 开发实战全套', by:'黑马程序员 · 2026-03-20', url:'https://www.bilibili.com/video/BV178w1z7EHQ', why:'★ 第二个必看。卖点是「从 Agent 开发到 LangSmith 的监控、调试、评估一套搞定」——LangSmith 那几节直接给你评测环节的可视化素材，这是绝大多数转行者拿不出来的东西。', hours:'12h', done:false},
+    {id:'r23',stage:'S1 筑基', pri:'P0', kind:'B站', type:'视频', title:'黑马 · Python Web：FastAPI 从入门到实战', by:'黑马程序员 · 2025-12-10', url:'https://www.bilibili.com/video/BV1zV2QBtE39', why:'★ 只看这些章节：框架简介 / 第一个程序 / 路由 / 请求体 / 文件响应 / 异常处理 / 中间件 / 项目结构 / 模型部署。跳过 ORM、数据库 CRUD、用户登录、分页——那部分你用不上，别浪费时间。', hours:'10h', done:false},
+    {id:'r24',stage:'S3 Agent', pri:'P1', kind:'B站', type:'视频', title:'黑马 · 零基础玩转 Dify（5 小时极速入门 Agent 开发）', by:'黑马程序员 · 2026-03-16', url:'https://www.bilibili.com/video/BV116w5zuEbo', why:'性价比之王。5 小时搞定一个 P1 目标，还涵盖 RAG + Text2SQL + 客服实战。低代码 Agent 平台你要的不是精通，是「知道什么时候该用它」。', hours:'5h', done:false},
+    {id:'r25',stage:'S2 检索', pri:'P0', kind:'GitHub', type:'仓库', title:'datawhalechina/all-in-rag（RAG 全栈中文教程）', by:'Datawhale · ★11063 · 2026-09-04 更新', url:'https://github.com/datawhalechina/all-in-rag', why:'★ 这次增补里最大的收获。你缺的不是某个库怎么调，而是整条链路的系统认知——这本就是为此写的。精读第 3 章（索引构建与优化）和第 6 章（生成集成与评测），产出直接对口 G5 分块实验 + G7 评测数据。', hours:'12h', done:false},
+    {id:'r26',stage:'S3 Agent', pri:'P0', kind:'GitHub', type:'仓库', title:'modelcontextprotocol/python-sdk（MCP 官方 Python SDK）', by:'MCP 官方 · ★24292 · 2026-09-10 更新', url:'https://github.com/modelcontextprotocol/python-sdk', why:'G11 的最优解：用官方 SDK 写一个「读取本地 docx / 导出数据」的最小 MCP Server，三四十行代码搞定，而且跟你的 OOXML 解析项目天然连得上——这是别人抄不走的 Demo。', hours:'4h', done:false},
+    {id:'r27',stage:'S2 检索', pri:'P1', kind:'GitHub', type:'仓库', title:'opendatalab/MinerU（复杂文档解析）', by:'上海人工智能实验室 · ★79894 · 2026-09-13 更新', url:'https://github.com/opendatalab/MinerU', why:'★ 对口你的项目 2。国产方案，中文排版效果最好。别人只会说「我用 PyPDFLoader」，你能说「我对比过 MinerU / Docling / Marker 三种解析方案」——分量完全不同。', hours:'3h', done:false},
+    {id:'r28',stage:'S2 检索', pri:'P1', kind:'GitHub', type:'仓库', title:'docling-project/docling（IBM 文档解析）', by:'IBM · ★66396 · 2026-09-14 更新', url:'https://github.com/docling-project/docling', why:'同上，三选一时用作对比组。表格 / 公式 / 图注的保留能力是它的强项，如果你的 OCR 结果里有表格结构，优先试它。', hours:'2h', done:false},
+    {id:'r29',stage:'S2 检索', pri:'P2', kind:'GitHub', type:'仓库', title:'datalab-to/marker（PDF→Markdown 高速转换）', by:'Datalab · ★39739 · 2026-09-13 更新', url:'https://github.com/datalab-to/marker', why:'三方案对比里的速度组。用它跑同一份脏数据，记录「正确率 / 耗时 / 表格保留」三项，这张对比表就是你作品集 README 里最亮的一块。', hours:'2h', done:false},
+    {id:'r30',stage:'S2 检索', pri:'P2', kind:'GitHub', type:'仓库', title:'PaddlePaddle/PaddleOCR', by:'百度飞桨 · ★89503 · 2026-07-22 更新', url:'https://github.com/PaddlePaddle/PaddleOCR', why:'先确认你自己目前用的 OCR 引擎是不是它。如果是，简历上必须写明「模型名称 + 版本号」——写得出型号的人和写不出的，在面试官眼里是两个层次。', hours:'1h', done:false},
+    {id:'r31',stage:'S4 收尾', pri:'P1', kind:'GitHub', type:'仓库', title:'promptfoo/promptfoo（LLM / RAG / Agent 评测）', by:'Promptfoo · ★25092 · 2026-09-14 更新', url:'https://github.com/promptfoo/promptfoo', why:'评测环节的主推工具（详见《学习资源地图-GitHub与B站-v2.2.md》§一）。相比 ragas 活跃度高得多，且支持 CI 集成。简历上「我用 promptfoo 做回归评测」比 ragas 更经得起追问。', hours:'4h', done:false},
+    {id:'r32',stage:'S4 收尾', pri:'P2', kind:'GitHub', type:'仓库', title:'vibrantlabsai/ragas（原 explodinggradients/ragas）', by:'Vibrant Labs · ★15725 · 2026-02-24 后停更', url:'https://github.com/vibrantlabsai/ragas', why:'⚠️ 已改名易手 + 停更 7 个月，不再作为主工具。但仍值得花 1 小时：faithfulness / answer_relevancy 两个指标的「定义口径」仍是业界被引用最多的，面试时你说得出定义就够了。', hours:'1h', done:false}
+  ];
+}
+
+/* =======================================================================
+   2026-09-14 增补目标（走增量迁移，不覆盖用户已有数据）
+   ======================================================================= */
+function GOALS_EXTRA_SEED(){
+  return [
+    {id:'g13', title:'影刀 RPA 技能认证（初级）：官网在线可查证书', stage:'S4 收尾', pri:'P2', status:'todo', due:dateAdd(START_DATE,19), res:'影刀初级技能证书（官网在线可查）'}
   ];
 }
 
@@ -700,7 +792,7 @@ const STAGES = [
   {key:'S1 筑基', name:'S1 · 筑基（服务）', days:'D1–D5', range:'5 天', color:'#2C6E9B', goal:'打通「服务」：能自己写接口、能自己打包部署', focus:'FastAPI + Docker + Redis', tasks:['FastAPI：路由 / Pydantic / 依赖注入 / 异常处理 / 日志','实现文件上传 + 文本切分接口','Dockerfile 多阶段构建，镜像瘦身','docker-compose 把 API + Redis 串起来','Redis 缓存与限流最小 demo','验收：一条 docker-compose up 拉起整套服务']},
   {key:'S2 检索', name:'S2 · 检索（RAG 全链路）', days:'D6–D11', range:'6 天', color:'#2F855A', goal:'打通「检索」：从文档到可回答的问题', focus:'Chroma + 分块 + 混合检索 + 重排', tasks:['文档解析：把 docx/PDF 转成结构化文本（复用你的 docx 引擎）','分块策略实验：固定长 / 递归 / 语义，各跑一组','Chroma 持久化向量库，BGE 中文 embedding','混合检索：BM25 + 向量，各自召回后融合','Rerank 重排序，测 top_k 与阈值影响','验收：分块对比实验结果表 + 召回率前后对比']},
   {key:'S3 Agent', name:'S3 · Agent（工具调用）', days:'D12–D16', range:'5 天', color:'#6B46C1', goal:'打通「Agent」：让模型能调用你的工具', focus:'Function Calling + LangGraph + MCP + Dify', tasks:['Function Calling：把考勤管道包装成一个 tool','LangGraph：reflection / tool-calling 两种图模式','写一个最小 MCP Server（filesystem + 本地数据）','Dify 搭一个可视化工作流，理解企业交付形态','验收：一个能真实跑通的 Agent Demo']},
-  {key:'S4 收尾', name:'S4 · 收尾（评测 + 作品集）', days:'D17–D21', range:'5 天', color:'#993C1D', goal:'把学到的东西变成「能给人看」的资产', focus:'RAGAS 评测 + README + 简历 3.0', tasks:['RAGAS 跑 faithfulness / answer_relevancy','把 RAG 项目整理成公开仓库（脱敏）','写 README + 架构图 + 快速开始','简历 3.0 定稿：只写已验证项','验收：GitHub 公开仓库 + 可投递简历']}
+  {key:'S4 收尾', name:'S4 · 收尾（评测 + 作品集）', days:'D17–D21', range:'5 天', color:'#993C1D', goal:'把学到的东西变成「能给人看」的资产', focus:'promptfoo 评测 + README + 简历 3.0', tasks:['promptfoo 跑回归评测集（faithfulness / relevancy 指标口径）','把 RAG 项目整理成公开仓库（脱敏）','写 README + 架构图 + 快速开始','简历 3.0 定稿：只写已验证项','验收：GitHub 公开仓库 + 可投递简历']}
 ];
 
 /* =======================================================================

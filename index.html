@@ -1419,6 +1419,44 @@ function cvPaint(){
   if(ce) ce.textContent = state.canvas.edges.length + ' 条连线';
 }
 
+/* ---------- 画布视口控制（缩放 / 居中 / 重置） ---------- */
+/* 视口中心像素坐标 —— 用于「以中心为锚点」缩放 */
+function cvViewCenter(){
+  const wrap = document.getElementById('cvWrap');
+  if(!wrap) return {x:0, y:0};
+  const r = wrap.getBoundingClientRect();
+  return {x: r.width/2, y: r.height/2};
+}
+/* 以 (mx,my) 为锚点缩放：缩放前后该点对应的画布坐标保持不变 */
+function cvZoomAt(factor, mx, my){
+  const old = CV.scale;
+  const next = Math.min(2.4, Math.max(0.3, old * factor));
+  if(next === old) return;
+  CV.tx = mx - (mx - CV.tx) * (next/old);
+  CV.ty = my - (my - CV.ty) * (next/old);
+  CV.scale = next;
+  cvPaint();
+}
+/* 把全部节点居中（保持当前 scale） */
+function cvCenter(){
+  const wrap = document.getElementById('cvWrap');
+  const ns = state.canvas.nodes;
+  if(!wrap) return;
+  if(!ns.length){ CV.tx = 24; CV.ty = 24; cvPaint(); return; }
+  let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+  ns.forEach(n=>{
+    const s = cvNodeSize(n);
+    x0 = Math.min(x0, n.x);        y0 = Math.min(y0, n.y);
+    x1 = Math.max(x1, n.x + s.w);  y1 = Math.max(y1, n.y + s.h);
+  });
+  const r = wrap.getBoundingClientRect();
+  CV.tx = (r.width  - (x1 - x0) * CV.scale) / 2 - x0 * CV.scale;
+  CV.ty = (r.height - (y1 - y0) * CV.scale) / 2 - y0 * CV.scale;
+  cvPaint();
+}
+/* 重置：回到 100% 并居中（与按钮 title「恢复到 100% 并居中」一致） */
+function cvResetView(){ CV.scale = 1; cvCenter(); }
+
 function cvBind(){
   const wrap = document.getElementById('cvWrap');
   if(!wrap || wrap.dataset.bound) return;
@@ -1426,6 +1464,10 @@ function cvBind(){
 
   wrap.querySelectorAll('.cvn').forEach(()=>{});
   wrap.addEventListener('pointerdown', e=>{
+    /* 必须放行画布浮层控件（＋ / － / 重置）：
+       wrap.setPointerCapture() 会把随后的 click 事件重定向到 wrap 本身，
+       按钮永远收不到点击 —— 表现为「按了没反应」。 */
+    if(e.target.closest('button')) return;
     const nodeEl = e.target.closest('.cvn');
     if(nodeEl){
       const id = nodeEl.dataset.id;
@@ -1481,13 +1523,7 @@ function cvBind(){
   wrap.addEventListener('wheel', e=>{
     e.preventDefault();
     const rect = wrap.getBoundingClientRect();
-    const mx = e.clientX - rect.left, my = e.clientY - rect.top;
-    const old = CV.scale;
-    const next = Math.min(2.4, Math.max(0.3, old * (e.deltaY<0 ? 1.12 : 0.89)));
-    CV.tx = mx - (mx - CV.tx) * (next/old);
-    CV.ty = my - (my - CV.ty) * (next/old);
-    CV.scale = next;
-    cvPaint();
+    cvZoomAt(e.deltaY<0 ? 1.12 : 0.89, e.clientX - rect.left, e.clientY - rect.top);
   }, {passive:false});
 }
 
@@ -2098,9 +2134,9 @@ function onAction(act, btn, e){
     case 'addNode': addNode(); break;
     case 'layout': layoutFit(); toast('已适应窗口'); break;
     case 'fit': layoutFit(); break;
-    case 'zin': CV.scale = Math.min(2.4, CV.scale*1.18); cvPaint(); break;
-    case 'zout': CV.scale = Math.max(0.3, CV.scale*0.85); cvPaint(); break;
-    case 'zreset': CV.scale = 1; cvPaint(); break;
+    case 'zin':    { const c = cvViewCenter(); cvZoomAt(1.18, c.x, c.y); break; }
+    case 'zout':   { const c = cvViewCenter(); cvZoomAt(0.85, c.x, c.y); break; }
+    case 'zreset': cvResetView(); toast('画布视图已重置'); break;
     case 'connectMode': {
       const w = document.getElementById('cvWrap');
       if(w){ w.dataset.connect = w.dataset.connect==='1' ? '0' : '1'; }

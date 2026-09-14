@@ -1,0 +1,2188 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>AI 转型作战台 · Career Ops Workspace</title>
+<style>
+/* ============================================================
+   设计系统 · ADHD / INTP 取向
+   原则：低装饰噪音 · 单一强调色 · 等宽数字 · 一屏一焦点 · 即时状态
+   ============================================================ */
+:root{
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",Roboto,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+  --r:8px; --r-s:6px; --r-xs:4px;
+  --ease:cubic-bezier(.4,0,.2,1);
+}
+/* ---------- 暗色（默认）---------- */
+body[data-theme="dark"]{
+  --bg:#0A0C10; --card:#12161B; --card-2:#171C23; --card-3:#1D232B;
+  --ink:#E9EDF3; --ink-2:#98A3B3; --ink-3:#687385;
+  --line:#232A33; --line-2:#1A2028;
+  --acc:#2DD4BF; --acc-2:#5EEAD4; --acc-ink:#05231F;
+  --acc-bg:rgba(45,212,191,.10); --acc-bd:rgba(45,212,191,.28);
+  --bad:#F87171;  --bad-bg:rgba(248,113,113,.11); --bad-bd:rgba(248,113,113,.30);
+  --warn:#FBBF24; --warn-bg:rgba(251,191,36,.11);  --warn-bd:rgba(251,191,36,.28);
+  --ok:#4ADE80;   --ok-bg:rgba(74,222,128,.10);    --ok-bd:rgba(74,222,128,.26);
+  --info:#60A5FA; --info-bg:rgba(96,165,250,.10);  --info-bd:rgba(96,165,250,.26);
+  --purple:#A78BFA; --purple-bg:rgba(167,139,250,.10); --purple-bd:rgba(167,139,250,.26);
+  --dot:rgba(255,255,255,.035);
+  --sh:0 1px 2px rgba(0,0,0,.35);
+  --sh-h:0 0 0 1px var(--acc-bd),0 10px 30px rgba(0,0,0,.5);
+  --topbar:rgba(10,12,16,.78);
+  --mobtab:rgba(18,22,27,.95);
+  --sel:rgba(45,212,191,.26);
+  --cv-dot:rgba(255,255,255,.055); --cv-edge:#3A434F;
+  --cv-leaf:#171C23; --cv-leaf-ink:#AEBBCC; --cv-hint:rgba(18,22,27,.92);
+  --cv-shadow:#000000;
+  color-scheme:dark;
+}
+/* ---------- 亮色 ---------- */
+body[data-theme="light"]{
+  --bg:#F5F7F9; --card:#FFFFFF; --card-2:#FAFBFC; --card-3:#F1F4F7;
+  --ink:#0D1117; --ink-2:#4B5563; --ink-3:#8A94A6;
+  --line:#E1E6EC; --line-2:#EDF0F4;
+  --acc:#0D9488; --acc-2:#14B8A6; --acc-ink:#FFFFFF;
+  --acc-bg:#E7F6F4; --acc-bd:#B3E2DC;
+  --bad:#DC2626;  --bad-bg:#FEF2F2;  --bad-bd:#F6CFCF;
+  --warn:#B45309; --warn-bg:#FEF7E8; --warn-bd:#F2DFB4;
+  --ok:#15803D;   --ok-bg:#EDF9F1;   --ok-bd:#C6E9D3;
+  --info:#1D4ED8; --info-bg:#EFF4FE; --info-bd:#C9D8F7;
+  --purple:#7C3AED; --purple-bg:#F5F1FE; --purple-bd:#DDD0FA;
+  --dot:rgba(13,17,23,.05);
+  --sh:0 1px 2px rgba(13,17,23,.04),0 3px 10px rgba(13,17,23,.045);
+  --sh-h:0 0 0 1px var(--acc-bd),0 10px 26px rgba(13,17,23,.10);
+  --topbar:rgba(245,247,249,.82);
+  --mobtab:rgba(255,255,255,.96);
+  --sel:rgba(13,148,136,.18);
+  --cv-dot:#DED7D1; --cv-edge:#C9BEB6;
+  --cv-leaf:#FFFFFF; --cv-leaf-ink:#5A514A; --cv-hint:rgba(255,255,255,.9);
+  --cv-shadow:#1F1B18;
+  color-scheme:light;
+}
+/* 旧令牌别名（保持既有内联样式零改动仍生效） */
+body{ --pri:var(--acc); --pri-l:var(--acc-2); --pri-bg:var(--acc-bg); --pri-bd:var(--acc-bd); }
+
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  font-family:var(--sans);background:var(--bg);color:var(--ink);
+  font-size:14.5px;line-height:1.62;-webkit-font-smoothing:antialiased;
+  font-variant-numeric:tabular-nums;
+  background-image:radial-gradient(var(--dot) 1px,transparent 0);
+  background-size:22px 22px;background-attachment:fixed;
+  transition:background-color .25s var(--ease),color .25s var(--ease);
+}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+input,select,textarea{font-family:inherit;font-size:16px;color:var(--ink)}
+a{color:var(--acc)}
+::selection{background:var(--sel)}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--line);border-radius:6px;border:2px solid var(--bg)}
+::-webkit-scrollbar-thumb:hover{background:var(--ink-3)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+/* ============ 布局 ============ */
+.app{display:flex;min-height:100vh}
+.sidebar{
+  width:222px;flex:0 0 222px;background:var(--card);border-right:1px solid var(--line);
+  display:flex;flex-direction:column;position:sticky;top:0;height:100vh;
+}
+.brand{padding:16px 16px 13px;border-bottom:1px solid var(--line-2);display:flex;gap:10px;align-items:center}
+.logo{
+  width:30px;height:30px;flex:0 0 30px;border-radius:var(--r-s);
+  background:linear-gradient(140deg,var(--acc),var(--acc-2));display:grid;place-items:center;
+}
+.logo svg{width:17px;height:17px;stroke:var(--acc-ink);fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.brand h1{margin:0;font-size:14.5px;font-weight:650;letter-spacing:-.2px;line-height:1.25}
+.brand p{margin:2px 0 0;font-size:10.5px;color:var(--ink-3);font-family:var(--mono);letter-spacing:.1px}
+.nav{padding:9px 9px;flex:1;overflow-y:auto}
+.nav button{
+  display:flex;align-items:center;gap:9px;width:100%;padding:8px 10px;margin-bottom:1px;
+  border-radius:var(--r-s);font-size:13px;color:var(--ink-2);text-align:left;
+  transition:background .15s var(--ease),color .15s var(--ease);position:relative;
+}
+.nav button svg{width:15px;height:15px;flex:0 0 15px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.nav button:hover{background:var(--card-3);color:var(--ink)}
+.nav button.on{background:var(--acc-bg);color:var(--acc);font-weight:600}
+.nav button.on::before{content:'';position:absolute;left:-9px;top:50%;transform:translateY(-50%);width:2.5px;height:16px;border-radius:0 3px 3px 0;background:var(--acc)}
+.nav button .nb{margin-left:auto;font-family:var(--mono);font-size:10.5px;font-weight:600;color:var(--ink-3);
+  background:var(--card-3);padding:1px 6px;border-radius:20px}
+.nav button.on .nb{background:var(--acc);color:var(--acc-ink)}
+.nav .sec{padding:13px 10px 5px;font-size:10px;color:var(--ink-3);letter-spacing:1px;font-weight:600;text-transform:uppercase}
+.sidebar-foot{padding:10px;border-top:1px solid var(--line-2);display:flex;flex-direction:column;gap:7px}
+.sync{display:flex;align-items:center;gap:6px;font-size:10.5px;color:var(--ink-3);padding:0 3px;font-family:var(--mono)}
+.sync .dot{width:6px;height:6px;border-radius:50%;background:var(--ok);flex:0 0 6px;box-shadow:0 0 0 3px var(--ok-bg)}
+.sync.busy .dot{background:var(--warn);box-shadow:0 0 0 3px var(--warn-bg)}
+.sync.off .dot{background:var(--ink-3);box-shadow:none}
+.mini{display:flex;gap:6px}
+.mini button{
+  flex:1;padding:7px 4px;border:1px solid var(--line);border-radius:var(--r-s);
+  font-size:11px;color:var(--ink-2);background:var(--card);transition:.15s var(--ease);
+}
+.mini button:hover{border-color:var(--acc-bd);color:var(--acc);background:var(--acc-bg)}
+.main{flex:1;min-width:0;display:flex;flex-direction:column}
+.topbar{
+  position:sticky;top:0;z-index:30;background:var(--topbar);backdrop-filter:blur(14px) saturate(1.4);
+  border-bottom:1px solid var(--line);padding:11px 26px;display:flex;align-items:center;gap:14px;
+}
+.topbar h2{margin:0;font-size:16px;font-weight:660;letter-spacing:-.25px;line-height:1.3}
+.topbar .sub{font-size:11.5px;color:var(--ink-3);margin-top:1px;font-family:var(--mono)}
+.topbar .sp{flex:1}
+.btn{
+  padding:7px 13px;border-radius:var(--r-s);font-size:12.5px;font-weight:560;
+  background:var(--acc);color:var(--acc-ink);transition:.15s var(--ease);white-space:nowrap;
+}
+.btn:hover{background:var(--acc-2)}
+.btn.ghost{background:var(--card);color:var(--ink-2);border:1px solid var(--line)}
+.btn.ghost:hover{border-color:var(--acc-bd);color:var(--acc);background:var(--acc-bg)}
+.btn.sm{padding:5px 10px;font-size:11.5px}
+.view{padding:20px 26px 80px;max-width:1240px;width:100%}
+.view[hidden]{display:none}
+
+/* ============ 卡片 ============ */
+.card{
+  background:var(--card);border:1px solid var(--line);border-radius:var(--r);
+  box-shadow:var(--sh);padding:15px 17px;margin-bottom:12px;
+  transition:border-color .18s var(--ease);
+}
+.card:hover{border-color:var(--line-2)}
+.card-h{display:flex;align-items:center;gap:9px;margin:0 0 12px}
+.card-h h3{margin:0;font-size:14px;font-weight:640;letter-spacing:-.15px}
+.card-h .sp{flex:1}
+.card-h .tag{font-size:10.5px;color:var(--ink-3);background:var(--card-3);padding:2px 8px;border-radius:20px;font-family:var(--mono)}
+.grid{display:grid;gap:12px}
+
+/* 今日焦点条 —— 一屏一焦点 */
+.focus{
+  position:relative;background:var(--card);border:1px solid var(--line);border-radius:var(--r);
+  padding:16px 18px 16px 21px;margin-bottom:12px;box-shadow:var(--sh);overflow:hidden;
+}
+.focus::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--acc)}
+.focus.warn::before{background:var(--warn)}
+.focus.bad::before{background:var(--bad)}
+.focus-l{font-size:10.5px;letter-spacing:1.1px;font-weight:650;color:var(--acc);text-transform:uppercase;font-family:var(--mono)}
+.focus.warn .focus-l{color:var(--warn)}
+.focus.bad .focus-l{color:var(--bad)}
+.focus-t{font-size:19px;font-weight:660;letter-spacing:-.4px;line-height:1.35;margin:5px 0 4px}
+.focus-m{font-size:12.5px;color:var(--ink-2);line-height:1.6}
+.focus-act{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+
+/* 告警区 */
+.g-alert{background:var(--bad-bg);border:1px solid var(--bad-bd);border-radius:var(--r);padding:13px 15px;margin-bottom:12px}
+.g-alert h4{margin:0 0 9px;font-size:12.5px;color:var(--bad);display:flex;align-items:center;gap:6px;font-weight:650}
+.g-alert h4 svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.alert-row{
+  display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--card);
+  border-radius:var(--r-s);margin-bottom:5px;border:1px solid var(--line);border-left:2.5px solid var(--bad);
+}
+.alert-row:last-child{margin-bottom:0}
+.alert-row .t{flex:1;min-width:0;font-size:12.5px}
+.alert-row .t b{font-weight:600}
+.alert-row .m{font-size:10.5px;color:var(--ink-3);margin-top:1px;font-family:var(--mono)}
+
+/* ============ 标签 ============ */
+.chip{
+  display:inline-flex;align-items:center;gap:4px;padding:1.5px 7px;border-radius:var(--r-xs);
+  font-size:10px;font-weight:640;letter-spacing:.25px;white-space:nowrap;
+  font-family:var(--mono);border:1px solid transparent;
+}
+.chip.p0{background:var(--bad-bg);color:var(--bad);border-color:var(--bad-bd)}
+.chip.p1{background:var(--warn-bg);color:var(--warn);border-color:var(--warn-bd)}
+.chip.p2{background:var(--info-bg);color:var(--info);border-color:var(--info-bd)}
+.chip.ok{background:var(--ok-bg);color:var(--ok);border-color:var(--ok-bd)}
+.chip.grey{background:var(--card-3);color:var(--ink-3);border-color:var(--line)}
+.chip.pur{background:var(--purple-bg);color:var(--purple);border-color:var(--purple-bd)}
+.chip.acc{background:var(--acc-bg);color:var(--acc);border-color:var(--acc-bd)}
+
+.done-btn{
+  width:24px;height:24px;flex:0 0 24px;border-radius:var(--r-xs);border:1.5px solid var(--line);
+  display:flex;align-items:center;justify-content:center;transition:.15s var(--ease);background:var(--card);
+}
+.done-btn svg{width:12px;height:12px;stroke:var(--ink-3);fill:none;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;opacity:0}
+.done-btn:hover{border-color:var(--ok);background:var(--ok-bg)}
+.done-btn.on{background:var(--ok);border-color:var(--ok)}
+.done-btn.on svg{stroke:#06210F;opacity:1}
+
+/* ============ 统计（等宽大数字）============ */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:11px;margin-bottom:13px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;box-shadow:var(--sh)}
+.stat .l{font-size:10.5px;color:var(--ink-3);letter-spacing:.5px;font-weight:600;text-transform:uppercase}
+.stat .v{font-size:26px;font-weight:660;letter-spacing:-1px;margin-top:2px;line-height:1.15;font-family:var(--mono)}
+.stat .v small{font-size:11.5px;font-weight:500;color:var(--ink-3);margin-left:2px;font-family:var(--mono)}
+.stat .b{margin-top:8px;height:3px;background:var(--card-3);border-radius:3px;overflow:hidden}
+.stat .b i{display:block;height:100%;background:var(--acc);border-radius:3px;transition:width .5s var(--ease)}
+
+/* ============ 进度条 / 时间线 ============ */
+.bar{height:4px;background:var(--card-3);border-radius:3px;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:3px;transition:width .5s var(--ease)}
+
+/* ============ 看板 ============ */
+.kanban{display:grid;grid-template-columns:repeat(4,minmax(212px,1fr));gap:11px;align-items:start}
+.col{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:11px;box-shadow:var(--sh);min-height:130px}
+.col-h{display:flex;align-items:center;gap:7px;margin-bottom:9px;padding-bottom:8px;border-bottom:1px solid var(--line-2)}
+.col-h .c-dot{width:6px;height:6px;border-radius:50%;flex:0 0 6px}
+.col-h .c-t{font-size:12px;font-weight:650;letter-spacing:-.1px}
+.col-h .c-n{font-size:10.5px;color:var(--ink-3);background:var(--card-3);padding:1px 7px;border-radius:20px;margin-left:auto;font-family:var(--mono)}
+.kcard{
+  background:var(--card-2);border:1px solid var(--line);border-left-width:2.5px;border-radius:var(--r-s);
+  padding:9px 10px;margin-bottom:7px;cursor:grab;transition:border-color .16s var(--ease),box-shadow .16s var(--ease);
+}
+.kcard:hover{box-shadow:var(--sh-h);border-color:var(--acc-bd)}
+.kcard.dragging{opacity:.35}
+.kcard .kt{font-size:12.5px;font-weight:600;line-height:1.45;margin-bottom:5px;letter-spacing:-.1px}
+.kcard .km{font-size:10.5px;color:var(--ink-3);display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-family:var(--mono)}
+.col.over{background:var(--acc-bg);border-color:var(--acc-bd)}
+
+/* ============ 网格卡片（通用）============ */
+.tile{background:var(--card-2);border:1px solid var(--line);border-radius:var(--r-s);padding:11px 13px}
+.tile .k{font-size:10.5px;color:var(--ink-3);letter-spacing:.3px;font-weight:600}
+.tile .v{font-size:12.5px;font-weight:600;margin-top:3px;line-height:1.45}
+
+/* ============ 可折叠 ============ */
+details.acc{border:1px solid var(--line);border-radius:var(--r-s);background:var(--card-2);margin-bottom:8px;overflow:hidden}
+details.acc>summary{
+  padding:10px 13px;cursor:pointer;font-size:12.5px;font-weight:600;list-style:none;
+  display:flex;align-items:center;gap:8px;transition:background .15s var(--ease);
+}
+details.acc>summary::-webkit-details-marker{display:none}
+details.acc>summary:hover{background:var(--card-3)}
+details.acc>summary .arw{margin-left:auto;font-family:var(--mono);color:var(--ink-3);font-size:11px;transition:transform .2s var(--ease)}
+details.acc[open]>summary .arw{transform:rotate(90deg)}
+details.acc>summary::before{content:'';width:3px;height:3px;border-radius:50%;background:var(--acc);flex:0 0 3px}
+details.acc .acc-b{padding:2px 13px 13px}
+
+/* ============ 表格（JD 映射）============ */
+.tbl{width:100%;border-collapse:collapse;font-size:12.5px}
+.tbl th{
+  text-align:left;font-size:10.5px;letter-spacing:.6px;text-transform:uppercase;font-weight:650;
+  color:var(--ink-3);padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap;
+}
+.tbl td{padding:9px 10px;border-bottom:1px solid var(--line-2);vertical-align:top;line-height:1.55}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tbody tr:hover{background:var(--card-2)}
+
+/* ============ 移动端 ============ */
+.mobtab{display:none}
+@media(max-width:900px){
+  .sidebar{display:none}
+  .kanban{grid-template-columns:1fr;gap:9px}
+  .view{padding:14px 13px 100px}
+  .topbar{padding:10px 13px}
+  body{font-size:14px}
+  .focus-t{font-size:17px}
+  .stat .v{font-size:23px}
+  .mobtab{
+    display:flex;position:fixed;bottom:0;left:0;right:0;z-index:50;background:var(--mobtab);
+    backdrop-filter:blur(14px) saturate(1.4);border-top:1px solid var(--line);
+    padding-bottom:env(safe-area-inset-bottom);
+  }
+  .mobtab{overflow-x:auto;scrollbar-width:none}
+  .mobtab::-webkit-scrollbar{display:none}
+  .mobtab button{
+    flex:0 0 20%;min-width:64px;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 2px 7px;
+    font-size:9.5px;color:var(--ink-3);min-height:54px;justify-content:center;
+  }
+  .mobtab button svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+  .mobtab button.on{color:var(--acc)}
+  .tools{flex-wrap:wrap}
+  .tbl{font-size:11.5px}
+  .tbl th,.tbl td{padding:7px 6px}
+}
+.toast{
+  position:fixed;left:50%;transform:translateX(-50%);bottom:84px;z-index:99;
+  background:var(--ink);color:var(--bg);padding:8px 16px;border-radius:var(--r-s);font-size:12.5px;
+  box-shadow:0 10px 30px rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:.22s var(--ease);
+  font-family:var(--mono);
+}
+.toast.show{opacity:1;bottom:96px}
+/* 主题切换 */
+.tt{
+  display:flex;align-items:center;justify-content:center;gap:6px;padding:7px 4px;
+  border:1px solid var(--line);border-radius:var(--r-s);font-size:11px;color:var(--ink-2);background:var(--card);
+  transition:.15s var(--ease);width:100%;
+}
+.tt:hover{border-color:var(--acc-bd);color:var(--acc);background:var(--acc-bg)}
+.tt svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
+/* ============ 窄屏表格 → 卡片 ============ */
+@media(max-width:760px){
+  .tbl thead{display:none}
+  .tbl,.tbl tbody,.tbl tr,.tbl td{display:block;width:100%!important}
+  .tbl tr{border:1px solid var(--line);border-radius:var(--r-s);margin-bottom:8px;padding:9px 11px;background:var(--card-2)}
+  .tbl td{border:none;padding:3px 0;font-size:12px}
+  .tbl td[data-l]::before{content:attr(data-l);display:block;font-size:9.5px;letter-spacing:.7px;
+    font-weight:650;color:var(--ink-3);text-transform:uppercase;margin-bottom:2px}
+  .tbl td[data-l]{margin-top:6px}
+}
+</style>
+</head>
+<body data-theme="dark">
+<div class="app">
+  <!-- ==================== 侧边栏 ==================== -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="logo">
+        <svg viewBox="0 0 24 24"><path d="M12 3 3 7.5l9 4.5 9-4.5L12 3Z"/><path d="M3 12.5 12 17l9-4.5"/><path d="M3 17 12 21.5 21 17"/></svg>
+      </div>
+      <div>
+        <h1>AI 转型作战台</h1>
+        <p>林知远 · 杭州 · 目标 8–11K</p>
+      </div>
+    </div>
+    <nav class="nav" id="nav"></nav>
+    <div class="sidebar-foot">
+      <div class="sync" id="syncBox"><span class="dot"></span><span id="syncTxt">本地模式 · 已就绪</span></div>
+      <div class="mini">
+        <button id="btnExport">导出备份</button>
+        <button id="btnImport">导入恢复</button>
+      </div>
+      <button class="tt" id="btnTheme">
+        <svg viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+        <span id="themeTxt">暗色模式</span>
+      </button>
+      <input type="file" id="fileImport" accept=".json" hidden>
+    </div>
+  </aside>
+
+  <!-- ==================== 主区 ==================== -->
+  <div class="main">
+    <header class="topbar">
+      <div>
+        <h2 id="pageTitle">今日要处理</h2>
+        <div class="sub" id="pageSub">—</div>
+      </div>
+      <div class="sp"></div>
+      <div class="tools" id="topTools" style="display:flex;gap:8px"></div>
+    </header>
+    <div id="views"></div>
+  </div>
+</div>
+
+<!-- 移动端底部 Tab -->
+<nav class="mobtab" id="mobtab"></nav>
+<div class="toast" id="toast"></div>
+
+<script>
+/* =======================================================================
+   数据层 —— 所有读写只在这里发生
+   ======================================================================= */
+const LS_KEY = 'career_ops_v1';
+
+const DEFAULT_DATA = {
+  version: 2,
+  targets: [],   // 学习目标（看板）
+  tasks: [],     // 今日待办
+  plans: [],     // 21天计划
+  resources: [], // 学习资料
+  sprint: [],    // 投递冲刺 · 14 天补齐清单
+  jdmap: [],     // JD 关键词映射
+  canvas: { nodes: [], edges: [], view: { x: 0, y: 0, z: 1 } },
+  skipExample: false
+};
+
+let state = JSON.parse(JSON.stringify(DEFAULT_DATA));
+
+function loadData(){
+  try{
+    const raw = localStorage.getItem(LS_KEY);
+    if(!raw){ state = seedData(); saveData(); return; }
+    const p = JSON.parse(raw);
+    state = Object.assign(JSON.parse(JSON.stringify(DEFAULT_DATA)), p);
+    if(!state.canvas || !state.canvas.nodes) state.canvas = { nodes:[], edges:[], view:{x:0,y:0,z:1} };
+    /* 版本迁移：老数据补齐新增模块，绝不覆盖已有内容 */
+    if(!state.sprint || !state.sprint.length) state.sprint = SPRINT_SEED();
+    if(!state.jdmap || !state.jdmap.length) state.jdmap = JDMAP_SEED();
+  }catch(e){
+    state = seedData();
+  }
+}
+
+let saveTimer = null;
+function saveData(){
+  try{
+    localStorage.setItem(LS_KEY, JSON.stringify(state));
+    flashSync('saving');
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(()=>flashSync('ok'), 550);
+  }catch(e){ flashSync('off'); }
+}
+
+function flashSync(mode){
+  const box = document.getElementById('syncBox');
+  const txt = document.getElementById('syncTxt');
+  if(!box) return;
+  box.className = 'sync' + (mode==='saving' ? ' busy' : mode==='off' ? ' off' : '');
+  txt.textContent = mode==='saving' ? '本地存储 · 保存中'
+                 : mode==='off'    ? '离线模式 · 请导出备份'
+                 : '本地模式 · 已就绪';
+}
+
+/* ---------- 日期工具（DAG 中最底层，无依赖） ---------- */
+function todayStr(){
+  const d = new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function dateAdd(baseStr, days){
+  const [y,m,d] = baseStr.split('-').map(Number);
+  const dt = new Date(y, m-1, d);
+  dt.setDate(dt.getDate()+days);
+  return dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0');
+}
+function daysBetween(a,b){
+  const pa=a.split('-').map(Number), pb=b.split('-').map(Number);
+  return Math.round((new Date(pb[0],pb[1]-1,pb[2]) - new Date(pa[0],pa[1]-1,pa[2]))/86400000);
+}
+function fmtMD(s){
+  if(!s) return '';
+  const [,m,d] = s.split('-');
+  return Number(m)+'月'+Number(d)+'日';
+}
+const START_DATE = '2026-09-15';   // 计划起算日
+
+/* =======================================================================
+   示例数据（首次打开预置，含 1 条逾期）
+   ======================================================================= */
+function seedData(){
+  const d = JSON.parse(JSON.stringify(DEFAULT_DATA));
+  const t = todayStr();
+  const y = dateAdd(t,-1);
+
+  d.targets = [
+    {id:'g1', title:'FastAPI 接口服务：含 Pydantic 校验 / 异常处理 / 日志', stage:'S1 筑基', pri:'P0', status:'doing', due:dateAdd(START_DATE,4), res:'可运行的文件上传 + RAG 接口服务'},
+    {id:'g2', title:'Docker 打包部署：一条命令拉起整套服务', stage:'S1 筑基', pri:'P0', status:'todo', due:dateAdd(START_DATE,5), res:'docker-compose up 可跑通'},
+    {id:'g3', title:'Chroma 向量库 + 文档分块策略实验', stage:'S2 检索', pri:'P0', status:'todo', due:dateAdd(START_DATE,8), res:'分块对比实验结果表'},
+    {id:'g4', title:'混合检索（BM25 + 向量）与重排序', stage:'S2 检索', pri:'P0', status:'todo', due:dateAdd(START_DATE,11), res:'召回率提升前后对比'},
+    {id:'g5', title:'Function Calling / LangGraph Agent 链路', stage:'S3 Agent', pri:'P0', status:'todo', due:dateAdd(START_DATE,16), res:'一个可用的 Agent Demo'},
+    {id:'g6', title:'MCP 协议 + Dify 工作流搭建', stage:'S3 Agent', pri:'P1', status:'todo', due:dateAdd(START_DATE,16), res:'MCP Server 接入示例'},
+    {id:'g7', title:'RAG 评测（RAGAS 或自建评测集）', stage:'S4 收尾', pri:'P1', status:'todo', due:dateAdd(START_DATE,19), res:'评测报告'},
+    {id:'g8', title:'作品集化：README + 架构文档 + Demo 链接', stage:'S4 收尾', pri:'P1', status:'todo', due:dateAdd(START_DATE,21), res:'GitHub 公开仓库'},
+    {id:'g9', title:'Redis 基础：缓存与限流最小 demo', stage:'S1 筑基', pri:'P2', status:'todo', due:dateAdd(START_DATE,5), res:'缓存 demo'},
+    {id:'g10',title:'简历 3.0 定稿 + 投递前真话核对', stage:'S4 收尾', pri:'P0', status:'todo', due:dateAdd(START_DATE,21), res:'可投递简历'},
+    {id:'g11',title:'补全 12 处话术准备（🟢🔵 项打磨到脱口而出）', stage:'S0 准备', pri:'P0', status:'done', due:dateAdd(START_DATE,1), res:'话术卡'},
+    {id:'g12',title:'能力自评表打勾，锁定真缺口清单', stage:'S0 准备', pri:'P0', status:'done', due:dateAdd(START_DATE,1), res:'自评表'}
+  ];
+
+  d.tasks = [
+    {id:'k1', title:'把「零成本全栈交付」话术写成 30 秒口述版本', pri:'P0', status:'today', due:t, src:'话术准备'},
+    {id:'k2', title:'测评系统架构图重画一遍（面试能讲清）', pri:'P1', status:'today', due:t, src:'作品集化'},
+    {id:'k3', title:'建 GitHub 公开仓库，push 测评系统脱敏版', pri:'P0', status:'todo', due:y, src:'作品集化'},
+    {id:'k4', title:'FastAPI 官方教程 Quickstart 跑通 + 改造成文件上传接口', pri:'P0', status:'doing', due:dateAdd(t,1), src:'S1 筑基'},
+    {id:'k5', title:'整理业务考勤管道的数据量口径（写简历前必须核实）', pri:'P0', status:'todo', due:dateAdd(t,2), src:'简历 3.0'},
+    {id:'k6', title:'docker-compose 把 FastAPI + Redis 串起来', pri:'P1', status:'todo', due:dateAdd(t,4), src:'S1 筑基'}
+  ];
+
+  d.resources = RES_SEED();
+  d.sprint = SPRINT_SEED();
+  d.jdmap = JDMAP_SEED();
+
+  d.canvas = {
+    nodes: [
+      {id:'n1', x:60,  y:230, w:214, text:'AI 应用落地工程师', type:'root', color:0},
+      {id:'n2', x:340, y:50,  w:214, text:'S1 筑基\nFastAPI / Docker / Redis', type:'branch', color:1},
+      {id:'n3', x:340, y:212, w:214, text:'S2 检索\nChroma / 分块 / 混合检索', type:'branch', color:2},
+      {id:'n4', x:340, y:374, w:214, text:'S3 Agent\nFunctionCalling / LangGraph / MCP', type:'branch', color:3},
+      {id:'n5', x:630, y:50,  w:214, text:'文件上传接口服务', type:'leaf', color:1},
+      {id:'n6', x:630, y:212, w:214, text:'RAG 全链路 Demo', type:'leaf', color:2},
+      {id:'n7', x:630, y:374, w:214, text:'Agent Demo + MCP', type:'leaf', color:3},
+      {id:'n8', x:630, y:536, w:214, text:'S4 收尾\n评测 / 作品集 / 简历3.0', type:'branch', color:4},
+      {id:'n9', x:340, y:536, w:214, text:'作品集公开仓库', type:'leaf', color:4}
+    ],
+    edges: [['n1','n2'],['n1','n3'],['n1','n4'],['n1','n8'],['n2','n5'],['n3','n6'],['n4','n7'],['n8','n9']],
+    view:{x:0,y:0,z:1}
+  };
+  return d;
+}
+
+/* =======================================================================
+   学习资料库（B站 + GitHub 为主，按画像筛选）
+   ======================================================================= */
+function RES_SEED(){
+  return [
+    /* ---- S1 筑基：FastAPI / Docker / Redis ---- */
+    {id:'r1', stage:'S1 筑基', pri:'P0', kind:'B站', type:'视频', title:'FastAPI 从入门到实战（完整项目）', by:'搜索关键词：FastAPI 教程 2025', url:'https://search.bilibili.com/all?keyword=FastAPI%20%E6%95%99%E7%A8%8B', why:'你有 Python 脚本基础但没写过 Web 服务，这是唯一必须系统补的一环。挑 8 小时以上的完整项目课，跟做一个带数据库的 CRUD。', hours:'10–12h', done:false},
+    {id:'r2', stage:'S1 筑基', pri:'P0', kind:'GitHub', type:'仓库', title:'tiangolo/fastapi', by:'FastAPI 官方', url:'https://github.com/tiangolo/fastapi', why:'官方文档 + tests 目录是最好的教材。重点看 dependencies/ 与 docs_src/，面试问到的依赖注入、Pydantic 校验都能直接抄理解。', hours:'3h', done:false},
+    {id:'r3', stage:'S1 筑基', pri:'P0', kind:'GitHub', type:'仓库', title:'docker/awesome-compose', by:'Docker 官方', url:'https://github.com/docker/awesome-compose', why:'里面有 fastapi 的 compose 示例，直接照着改就能把「一条命令拉起整套服务」这个简历点做实。', hours:'2h', done:false},
+    {id:'r4', stage:'S1 筑基', pri:'P1', kind:'B站', type:'视频', title:'Docker 容器化部署实战（含 Dockerfile 优化）', by:'搜索关键词：Docker 实战 部署', url:'https://search.bilibili.com/all?keyword=Docker%20%E5%AE%9E%E6%88%98%20%E9%83%A8%E7%BD%B2', why:'你已有 Railway / CloudStudio 的 PaaS 经验，只差「自己写镜像」这一步。看 4–6 小时的就够。', hours:'5h', done:false},
+    {id:'r5', stage:'S1 筑基', pri:'P2', kind:'GitHub', type:'仓库', title:'redis/redis', by:'Redis 官方', url:'https://github.com/redis/redis', why:'P2 了解层。只需跑通 docker run redis + 一个缓存/限流 demo，不啃源码。', hours:'2h', done:false},
+
+    /* ---- S2 检索：RAG 全链路 ---- */
+    {id:'r6', stage:'S2 检索', pri:'P0', kind:'GitHub', type:'仓库', title:'chatchat-space/Langchain-Chatchat', by:'国内 RAG 标杆项目', url:'https://github.com/chatchat-space/Langchain-Chatchat', why:'中文 RAG 领域最值得读的开源实现。重点读 document_loader / text_splitter / vectorstore 三块，你的 docx 标准化经验在这里能直接迁移。', hours:'6h', done:false},
+    {id:'r7', stage:'S2 检索', pri:'P0', kind:'GitHub', type:'仓库', title:'chroma-core/chroma', by:'Chroma 官方', url:'https://github.com/chroma-core/chroma', why:'向量库选它而不是 Milvus——轻量、pip 装完即用、单机够，与你「零成本交付」定位一致。看 README 的 quickstart + persistent client。', hours:'3h', done:false},
+    {id:'r8', stage:'S2 检索', pri:'P0', kind:'B站', type:'视频', title:'RAG 检索增强生成实战（LangChain + 向量库）', by:'搜索关键词：RAG 实战 LangChain', url:'https://search.bilibili.com/all?keyword=RAG%20%E5%AE%9E%E6%88%98%20LangChain', why:'必须看「分块策略对比」和「混合检索」两节——这是简历里 S2 两个目标（G3/G4）的直接来源。', hours:'8h', done:false},
+    {id:'r9', stage:'S2 检索', pri:'P0', kind:'GitHub', type:'仓库', title:'infiniflow/ragflow', by:'RAGFlow', url:'https://github.com/infiniflow/ragflow', why:'看它的 chunk 可视化与混合检索打分实现。你口述「分块实验」时能引用真实参数（chunk_size / overlap / top_k）。', hours:'4h', done:false},
+    {id:'r10',stage:'S2 检索', pri:'P1', kind:'GitHub', type:'仓库', title:'FlagOpen/FlagEmbedding（BGE 模型）', by:'智源研究院', url:'https://github.com/FlagOpen/FlagEmbedding', why:'BGE 中文 embedding 是目前国内落地首选，面试大概率会问「你用的什么 embedding 模型」。至少跑通 bge-small-zh 的编码示例。', hours:'2h', done:false},
+    {id:'r11',stage:'S2 检索', pri:'P1', kind:'B站', type:'视频', title:'提示词工程与 Rerank 重排序原理', by:'搜索关键词：Rerank 重排序 原理', url:'https://search.bilibili.com/all?keyword=Rerank%20%E9%87%8D%E6%8E%92%E5%BA%8F', why:'补 G4 的理论底子，让你能解释「为什么要 rerank」而不只是「我调了个库」。', hours:'3h', done:false},
+
+    /* ---- S3 Agent ---- */
+    {id:'r12',stage:'S3 Agent', pri:'P0', kind:'GitHub', type:'仓库', title:'langchain-ai/langgraph', by:'LangChain 官方', url:'https://github.com/langchain-ai/langgraph', why:'Agent 链路现在的主流答案。看 examples/ 里的 reflection 与 tool-calling 两个模式，直接改造成你的 Demo。', hours:'5h', done:false},
+    {id:'r13',stage:'S3 Agent', pri:'P0', kind:'GitHub', type:'仓库', title:'modelcontextprotocol/servers', by:'MCP 官方', url:'https://github.com/modelcontextprotocol/servers', why:'MCP 是 2025 后的硬性加分项。先跑通 filesystem server，再自己写一个最小的 MCP Server 接你本地的数据。', hours:'4h', done:false},
+    {id:'r14',stage:'S3 Agent', pri:'P0', kind:'B站', type:'视频', title:'Function Calling 原理与实战（大模型工具调用）', by:'搜索关键词：Function Calling 实战', url:'https://search.bilibili.com/all?keyword=Function%20Calling%20%E5%AE%9E%E6%88%98', why:'Agent 的最小原型。你把公司考勤管道包装成一个 tool，就是现成的 Demo 素材。', hours:'4h', done:false},
+    {id:'r15',stage:'S3 Agent', pri:'P1', kind:'GitHub', type:'仓库', title:'langgenius/dify', by:'Dify', url:'https://github.com/langgenius/dify', why:'国内企业落地最常见的低代码 Agent 平台。面试提到 Dify 会显得你有「交付视角」而不只是「技术视角」——这正是你的差异化。', hours:'4h', done:false},
+    {id:'r16',stage:'S3 Agent', pri:'P1', kind:'GitHub', type:'仓库', title:'openai/openai-cookbook', by:'OpenAI 官方', url:'https://github.com/openai/openai-cookbook', why:'工具调用、结构化输出、评测的标准范例集。挑 RAG 和 function-calling 两章精读。', hours:'3h', done:false},
+
+    /* ---- S4 收尾：评测 / 作品集 ---- */
+    {id:'r17',stage:'S4 收尾', pri:'P1', kind:'GitHub', type:'仓库', title:'explodinggradients/ragas', by:'RAGAS', url:'https://github.com/explodinggradients/ragas', why:'RAG 评测事实标准。跑通 faithfulness / answer_relevancy 两个指标，你就能说「我做过 RAG 量化评测」——90% 转行者说不出来。', hours:'4h', done:false},
+    {id:'r18',stage:'S4 收尾', pri:'P0', kind:'GitHub', type:'仓库', title:'ai-engineering-hub（免费 AI 工程实战项目集）', by:'GitHub 搜索：rag production ready', url:'https://github.com/search?q=rag+production+ready&type=repositories', why:'找一个 star 500+、有完整 README/架构图的 RAG 项目作为你作品集的「结构参照」，学它怎么写 README、画架构图。', hours:'3h', done:false},
+    {id:'r19',stage:'S4 收尾', pri:'P0', kind:'文档', type:'规范', title:'GitHub README + LICENSE 规范（作品集门面）', by:'搜索关键词：awesome-readme', url:'https://github.com/matiassingers/awesome-readme', why:'你的短板不是技术是「不会包装」。作品集仓库的 README 是第一印象，照着优秀样例改，比多写 200 行代码有用。', hours:'2h', done:false},
+
+    /* ---- 口述 / 面试 ---- */
+    {id:'r20',stage:'贯穿', pri:'P0', kind:'B站', type:'视频', title:'AI 应用开发岗面试真题（RAG/Agent 高频问题）', by:'搜索关键词：RAG 面试题 2025', url:'https://search.bilibili.com/all?keyword=RAG%20%E9%9D%A2%E8%AF%95%E9%A2%98', why:'你最大的风险是「简历写了但答不上」。用面试题反查学习清单，比盲学高效得多。', hours:'3h', done:false}
+  ];
+}
+
+/* =======================================================================
+   投递冲刺 · 14 天补齐清单
+   原则：每天一个「可拿给人看」的产出物，产出驱动而非学习驱动
+   ======================================================================= */
+function SPRINT_SEED(){
+  const D = n => dateAdd(START_DATE, n-1);
+  return [
+    {id:'sp1', day:'D1', due:D(1), out:'简历事实核对表',
+     title:'把所有量化数字核实一遍，一个都不许含混',
+     items:['员工规模口径：全公司 vs 你经手的范围，写清具体数字',
+            '考勤数据量：月度明细到底多少条，导出一次真实计数',
+            '测评系统：题量 / 体系数 / 外部报价能否复述来源',
+            '内刊 / 年会 / 后勤省下的成本，逐项列出可自证的金额'],
+     hours:'2h', risk:'别在这一步反复纠结措辞，先核数字，措辞 D14 统一打磨', done:false},
+    {id:'sp2', day:'D2', due:D(2), out:'GitHub 公开仓库 #1（测评系统）',
+     title:'开仓库 + 脱敏 + README + 架构图',
+     items:['新建公开仓库，push 脱敏版代码（去掉公司域名/密钥/真实员工数据）',
+            'README 写清：解决什么问题 → 技术选型 → 怎么跑起来 → 截图',
+            '画一张架构图（前端 / Supabase / 评分引擎 / 部署）',
+            '补充 .env.example，把密钥全部抽离'],
+     hours:'3h', risk:'最大卡点是"要不要脱敏"，先复制一份改，别在原仓库上动刀', done:false},
+    {id:'sp3', day:'D3', due:D(3), out:'GitHub 公开仓库 #2（数据管道）',
+     title:'考勤数据治理管道开源化，附脱敏样例',
+     items:['造一份 20 人 × 1 个月的假数据作为样例输入',
+            '规则引擎代码独立成模块，附单元测试或跑通截图',
+            'README 里放「输入宽表 → 输出宽表」的前后对比',
+            '把结论写进简历：从人工 X 小时 → 脚本 X 分钟'],
+     hours:'3h', risk:'这条最能打动面试官，因为它是真实的业务闭环，别低估它', done:false},
+    {id:'sp4', day:'D4', due:D(4), out:'GitHub 公开仓库 #3（docx 引擎）',
+     title:'docx 标准化引擎开源化 + 模板示例',
+     items:['放 3 套脱敏模板（红头文件 / 会议纪要 / 用印申请）',
+            'README 写清 OOXML 样式树解析思路（这是技术亮点）',
+            '录一个 30 秒的「输入乱格式 → 输出标准格式」演示'],
+     hours:'3h', risk:'这套东西在国内办公自动化场景极稀缺，是你的差异化护城河', done:false},
+    {id:'sp5', day:'D5', due:D(5), out:'可运行的 FastAPI 服务',
+     title:'FastAPI 筑基：能自己写接口',
+     items:['路由 / 请求体 / 响应模型 / Pydantic 校验 全部过一遍',
+            '实现「文件上传 + 文档切分」接口，跑通 Swagger UI',
+            '加上异常处理与日志中间件',
+            '把服务代码 push 成公开仓库 #4'],
+     hours:'5h', risk:'目标是"能讲清依赖注入和校验"，不是把文档全背下来', done:false},
+    {id:'sp6', day:'D6', due:D(6), out:'Docker 一键部署',
+     title:'容器化：一条命令拉起整套服务',
+     items:['写 Dockerfile（多阶段构建，镜像瘦身）',
+            'docker-compose 串起 FastAPI + Redis',
+            '在 README 里补「三行命令跑起来」',
+            '把这一步写进简历：独立完成容器化部署'],
+     hours:'4h', risk:'网络拉镜像慢是常态，提前配好国内镜像源', done:false},
+    {id:'sp7', day:'D7', due:D(7), out:'半天复盘 + 简历 2.5 版',
+     title:'缓冲区：不学新东西，回头补前面欠的账',
+     items:['把 D1–D6 没做完的部分补完（通常会欠 1–2 天，正常）',
+            '简历更新到 2.5 版：加上已开源的项目链接',
+            '给每个项目写「30 秒口述版」，录音自己听一遍'],
+     hours:'4h', risk:'这一天是刻意留的缓冲，不是浪费——ADHD 最大的敌人是计划落空后的放弃', done:false},
+    {id:'sp8', day:'D8', due:D(8), out:'RAG 最小可跑链路',
+     title:'从文档到能回答问题',
+     items:['文档解析：docx/PDF → 结构化文本（复用你的 docx 引擎经验）',
+            '分块策略实验：固定长 / 递归 / 语义 各跑一组，出对比表',
+            'Chroma 持久化向量库 + BGE 中文 embedding',
+            '跑通「提问 → 检索 → 带引用回答」的完整闭环'],
+     hours:'6h', risk:'这是整个计划的核心，卡住就降级：先用小文档跑通再说', done:false},
+    {id:'sp9', day:'D9', due:D(9), out:'混合检索 + Rerank 对比结果',
+     title:'让检索质量可量化',
+     items:['BM25 关键词召回 + 向量召回，融合排序',
+            '接 Rerank 重排序，记录 top_k 与阈值的影响',
+            '产出一张「召回率提升前后」对比表（面试必用）',
+            '把参数选择理由写成一段话，练到能脱口而出'],
+     hours:'5h', risk:'面试官最爱问"分块参数怎么定的"，这张表就是答案', done:false},
+    {id:'sp10', day:'D10', due:D(10), out:'Function Calling 工具调用 Demo',
+     title:'把你的业务系统变成模型能调用的工具',
+     items:['把考勤管道包装成一个 tool（输入月份，输出宽表）',
+            '跑通「模型自己决定调哪个工具、传什么参数」',
+            '录屏或截图，作为作品集里的动态演示'],
+     hours:'5h', risk:'这一步能把你从"调 API 的"变成"做 Agent 的"，价值最高', done:false},
+    {id:'sp11', day:'D11', due:D(11), out:'Agent 链路 Demo + MCP 示例',
+     title:'从单次调用到多步推理',
+     items:['LangGraph：reflection 或 tool-calling 两种图模式跑通一种',
+            '写一个最小 MCP Server（接本地文件或数据）',
+            'Dify 里搭一个可视化工作流，理解企业交付形态'],
+     hours:'5h', risk:'不求全，跑通一种模式即可——数量不重要，能讲清最重要', done:false},
+    {id:'sp12', day:'D12', due:D(12), out:'RAG 评测报告',
+     title:'证明你不是"调了个库"',
+     items:['RAGAS 跑 faithfulness / answer_relevancy 两个指标',
+            '自己造 20 条评测问题集（用你的业务文档）',
+            '记录优化前后的指标变化'],
+     hours:'4h', risk:'90% 的转行者说不出量化评测，这是你的超额分', done:false},
+    {id:'sp13', day:'D13', due:D(13), out:'作品集总入口',
+     title:'把 6 个项目收成一个能一眼看懂的门面',
+     items:['建 portfolio 仓库或一页 HTML，列出所有项目 + 一句话价值',
+            '每个项目统一「问题 → 方案 → 技术 → 结果」四段式',
+            'GitHub 个人主页 README 补上：我是谁 / 我会什么 / 我在找什么'],
+     hours:'3h', risk:'这一步的性价比高于多写 200 行代码', done:false},
+    {id:'sp14', day:'D14', due:D(14), out:'简历 3.0 定稿 + 首批投递',
+     title:'收口：把 14 天的东西变成面试机会',
+     items:['简历定稿，12 处技术断言逐条自测能否答上',
+            '准备 3 个「踩坑—定位—解决」的故事（面试 80% 会问）',
+            '定向投递首批 10 家：优先 AI 应用落地 / RAG / 企业数字化方向',
+            '给每个投递岗位单独改写简历首段（关键词对齐）'],
+     hours:'5h', risk:'先投 10 家试水，用面试反馈修正，别等"准备好"——永远等不到', done:false}
+  ];
+}
+
+/* =======================================================================
+   JD 关键词映射 —— 岗位要什么 ↔ 你手里有什么 ↔ 还缺什么
+   ready: green 已有真弹药 / blue 需打磨到能讲 / red 必须补出来
+   ======================================================================= */
+function JDMAP_SEED(){
+  return [
+    {id:'j1', kw:'Python 开发', freq:'必备', resume:'考勤数据治理流水线 / docx 标准化引擎', ready:'green',
+     note:'你的 Python 是"解决问题型"而非"工程型"，措辞用「独立编写数据处理脚本与自动化工具」，别自称精通。'},
+    {id:'j2', kw:'RESTful API 设计与调用', freq:'必备', resume:'企业协作平台开放 API 对接（考勤 / 通讯录 / 审批）', ready:'green',
+     note:'真实调过企业级开放平台，含分页、鉴权、限流、错误码处理——这些都是加分细节，务必讲出来。'},
+    {id:'j3', kw:'大模型 API 对接', freq:'必备', resume:'测评系统评分引擎 / 多模型网关配置', ready:'green',
+     note:'要能讲清「模型返回不稳定怎么兜底」：重试、结构化输出校验、降级策略。'},
+    {id:'j4', kw:'Prompt Engineering', freq:'必备', resume:'测评报告生成 / 文案生成 / 多源分析', ready:'green',
+     note:'准备一个对比案例：同一个 prompt 改了什么、输出质量差在哪。空谈技巧会被追问穿。'},
+    {id:'j5', kw:'文档解析与文本处理', freq:'高频', resume:'docx 格式标准化引擎 / 视频字幕 OCR 提取', ready:'green',
+     note:'这是你的隐形强项——RAG 落地 60% 的坑在文档解析，你有真实工程经验。'},
+    {id:'j6', kw:'数据清洗 / ETL', freq:'高频', resume:'20 万+条原始数据 → 3 万条结构化条目', ready:'green',
+     note:'强调「规范化 + 溯源 + 置信度」这套设计思路，很多候选人只会 pandas 基础操作。'},
+    {id:'j7', kw:'SQL / 关系型数据库', freq:'必备', resume:'Supabase / PostgreSQL 建表与查询', ready:'green',
+     note:'需要补：索引原理、慢查询优化、事务。面试问"为什么加索引"要答得上。'},
+    {id:'j8', kw:'Git / 版本管理', freq:'必备', resume:'私有仓库版本化管理 / 分支与协作流程', ready:'green',
+     note:'把「私有仓库」升级为「公开仓库 + 规范 README」——面试官真的会点进去看。'},
+    {id:'j9', kw:'前端基础（HTML/CSS/JS）', freq:'加分', resume:'测评系统前端 / 本工作台', ready:'green',
+     note:'你的定位是"能独立交付完整产品"，这在中小企业极受欢迎，主动讲。'},
+    {id:'j10',kw:'云部署 / PaaS', freq:'高频', resume:'静态托管 + 云托管平台部署（含免费层选型）', ready:'green',
+     note:'突出零成本意识：免费层选型、静态托管、Serverless——中小企业最吃这套。'},
+    {id:'j11',kw:'FastAPI / Web 框架', freq:'必备', resume:'—', ready:'red',
+     note:'硬缺口。S1 阶段补：路由、Pydantic 校验、依赖注入、中间件。必须有一个能跑的公开仓库。'},
+    {id:'j12',kw:'Docker / 容器化', freq:'必备', resume:'—', ready:'red',
+     note:'硬缺口。至少做到：手写 Dockerfile、多阶段构建、docker-compose 编排。简历写"独立完成容器化部署"。'},
+    {id:'j13',kw:'向量数据库（Chroma / Milvus / FAISS）', freq:'高频', resume:'—', ready:'red',
+     note:'硬缺口。选 Chroma 入门（轻量、pip 即用），跑通持久化与元数据过滤，别一上来碰 Milvus。'},
+    {id:'j14',kw:'RAG 全链路（检索增强生成）', freq:'核心', resume:'概念清楚，缺完整落地', ready:'red',
+     note:'岗位核心要求。必须能画全链路图并讲清每环：解析 → 分块 → 嵌入 → 检索 → 重排 → 生成 → 评测。'},
+    {id:'j15',kw:'LangChain / LangGraph', freq:'高频', resume:'—', ready:'red',
+     note:'不要只调 Chain，重点是 LangGraph 的状态图与条件分支——这是区分"会用"和"懂 Agent"的分界线。'},
+    {id:'j16',kw:'Agent / Function Calling / MCP', freq:'加分', resume:'—', ready:'red',
+     note:'2025 后的硬加分项。把你的考勤管道包成 tool 就是最有说服力的 Demo，性价比最高的一步。'},
+    {id:'j17',kw:'Redis / 缓存与限流', freq:'加分', resume:'—', ready:'blue',
+     note:'了解层即可：缓存读写、过期策略、简单限流。P2，时间不够直接跳过。'},
+    {id:'j18',kw:'Linux 基本操作', freq:'高频', resume:'服务器环境运维、SSH Deploy Key 部署', ready:'blue',
+     note:'补：常用命令、查看日志、进程管理、权限。面试可能让你现场敲几条。'}
+  ];
+}
+
+/* =======================================================================
+   认知配置 —— ADHD × INTP 执行协议（替代原「基本身份」区块）
+   ======================================================================= */
+const COGNITION = [
+  {t:'注意力是脉冲式的，不是线性的', k:'所以你需要的不是"每天 8 小时"，而是 3–4 个 45 分钟的强专注块。计划表里每项都标了预计耗时——按块认领，别按天认领。'},
+  {t:'启动阻力 > 执行难度', k:'最难的是"开始"。所以本工作台的每一项都写成了可执行动词（"跑通"、"写清"、"push"），而不是"学习 XXX"。看到动词就直接做，不要先想整体。'},
+  {t:'外部结构 > 意志力', k:'你不需要更自律，你需要更少的决策。看板四栏（待启动/进行中/已完成/卡住了）+ 每日清单就是你的外部前额叶，把该判断的事交给它。'},
+  {t:'需要即时反馈才走得动', k:'所以每个目标都要求「可验收的产出物」。跑通一个接口、push 一个仓库、录一段演示——这类即时完成感是你的燃料，比"又学完一章"有效得多。'},
+  {t:'讨厌重复劳动和低效流程', k:'这是 INTP 的核心驱动。你已经自发地把考勤、报销、通知自动化了——这不是"工作中偷懒"，这是你真正的职业能力信号，面试时要这么讲。'},
+  {t:'完美主义会伪装成"准备不足"', k:'"再学一点就投"是最大的陷阱。D14 硬性投递 10 家，用真实面试反馈来修正，比在家再准备 30 天有用一百倍。'}
+];
+
+/* =======================================================================
+   21 天计划（阶段轴）
+   ======================================================================= */
+const STAGES = [
+  {key:'S0 准备', name:'S0 · 话术准备', days:'D0', range:'起算日前', color:'#8C8179', goal:'把已具备的能力打磨到「脱口而出」', focus:'不花技术时间，纯表达准备', tasks:['逐条核对简历 2.0 的 12 处技术断言','给每个项目写 30 秒 / 2 分钟两版口述','准备 3 个「踩坑—定位—解决」的故事','能力自评表打勾，锁定真缺口']},
+  {key:'S1 筑基', name:'S1 · 筑基（服务）', days:'D1–D5', range:'5 天', color:'#2C6E9B', goal:'打通「服务」：能自己写接口、能自己打包部署', focus:'FastAPI + Docker + Redis', tasks:['FastAPI：路由 / Pydantic / 依赖注入 / 异常处理 / 日志','实现文件上传 + 文本切分接口','Dockerfile 多阶段构建，镜像瘦身','docker-compose 把 API + Redis 串起来','Redis 缓存与限流最小 demo','验收：一条 docker-compose up 拉起整套服务']},
+  {key:'S2 检索', name:'S2 · 检索（RAG 全链路）', days:'D6–D11', range:'6 天', color:'#2F855A', goal:'打通「检索」：从文档到可回答的问题', focus:'Chroma + 分块 + 混合检索 + 重排', tasks:['文档解析：把 docx/PDF 转成结构化文本（复用你的 docx 引擎）','分块策略实验：固定长 / 递归 / 语义，各跑一组','Chroma 持久化向量库，BGE 中文 embedding','混合检索：BM25 + 向量，各自召回后融合','Rerank 重排序，测 top_k 与阈值影响','验收：分块对比实验结果表 + 召回率前后对比']},
+  {key:'S3 Agent', name:'S3 · Agent（工具调用）', days:'D12–D16', range:'5 天', color:'#6B46C1', goal:'打通「Agent」：让模型能调用你的工具', focus:'Function Calling + LangGraph + MCP + Dify', tasks:['Function Calling：把考勤管道包装成一个 tool','LangGraph：reflection / tool-calling 两种图模式','写一个最小 MCP Server（filesystem + 本地数据）','Dify 搭一个可视化工作流，理解企业交付形态','验收：一个能真实跑通的 Agent Demo']},
+  {key:'S4 收尾', name:'S4 · 收尾（评测 + 作品集）', days:'D17–D21', range:'5 天', color:'#993C1D', goal:'把学到的东西变成「能给人看」的资产', focus:'RAGAS 评测 + README + 简历 3.0', tasks:['RAGAS 跑 faithfulness / answer_relevancy','把 RAG 项目整理成公开仓库（脱敏）','写 README + 架构图 + 快速开始','简历 3.0 定稿：只写已验证项','验收：GitHub 公开仓库 + 可投递简历']}
+];
+
+/* =======================================================================
+   调用链（严格单向 DAG）
+     render*  →  读 state，只写 DOM，禁止互相调用
+     refreshAll() → 唯一统一刷新入口
+   ======================================================================= */
+const $  = (s,r)=>(r||document).querySelector(s);
+const $$ = (s,r)=>Array.from((r||document).querySelectorAll(s));
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function uid(p){ return (p||'x')+Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
+function nl2br(s){ return esc(s).replace(/\n/g,'<br>'); }
+
+let VIEW = 'today';
+
+/* ---------- 视图注册表 ---------- */
+const VIEWS = [
+  {key:'today',  label:'今日要处理', short:'今日', group:'执行', icon:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+   sub:()=>todayStr()+' · 逾期与今日聚焦',
+   badge:()=>{ const n=collectAlerts().length; return n ? String(n) : ''; }},
+  {key:'kanban', label:'目标看板', short:'看板', group:'执行',
+   icon:'<rect x="3" y="4" width="4.5" height="16" rx="1"/><rect x="10" y="4" width="4.5" height="11" rx="1"/><rect x="17" y="4" width="4" height="7" rx="1"/>',
+   sub:()=>state.targets.length+' 个目标 · 未完成 '+state.targets.filter(g=>g.status!=='done').length,
+   badge:()=>String(state.targets.filter(g=>g.status!=='done').length||'')},
+  {key:'sprint', label:'投递冲刺', short:'冲刺', group:'执行',
+   icon:'<path d="M5 21V4"/><path d="M5 5h11l-2.2 4L16 13H5"/>',
+   sub:()=>'14 天补齐清单 · 产出驱动',
+   badge:()=>{ const n=(state.sprint||[]).filter(x=>!x.done).length; return n ? String(n) : ''; }},
+  {key:'plan',   label:'21天计划', short:'计划', group:'执行',
+   icon:'<path d="M4 6h16M4 12h16M4 18h10"/><circle cx="19" cy="18" r="2"/>',
+   sub:()=>'S0–S4 五阶段 · 起算 '+START_DATE,
+   badge:()=>'D'+Math.max(1, Math.min(21, daysBetween(START_DATE, todayStr())+1))},
+  {key:'res',    label:'学习资料', short:'资料', group:'资产',
+   icon:'<path d="M4 5.5A2 2 0 0 1 6 3.5h5v17H6a2 2 0 0 0-2 2z"/><path d="M20 5.5a2 2 0 0 0-2-2h-5v17h5a2 2 0 0 1 2 2z"/>',
+   sub:()=>'B站 + GitHub · 按阶段筛选',
+   badge:()=>String(state.resources.filter(r=>!r.done).length||'')},
+  {key:'jdmap',  label:'JD 映射', short:'JD', group:'资产',
+   icon:'<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.2"/><path d="M12 4V2M12 22v-2M4 12H2M22 12h-2"/>',
+   sub:()=>'岗位要什么 · 你缺什么',
+   badge:()=>{ const n=(state.jdmap||[]).filter(j=>j.ready==='red').length; return n ? String(n) : ''; }},
+  {key:'canvas', label:'无限画布', short:'画布', group:'工具',
+   icon:'<circle cx="6" cy="7" r="3"/><circle cx="18" cy="7" r="3"/><circle cx="12" cy="18" r="3"/><path d="M8.6 8.6 11 15.5M15.4 8.6 13 15.5M9 7h6"/>',
+   sub:()=>'网状思维图 · 一键生成 + 导出',
+   badge:()=>String(state.canvas.nodes.length||'')},
+  {key:'profile',label:'认知配置', short:'认知', group:'关于我',
+   icon:'<rect x="6" y="6" width="12" height="12" rx="2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5.5 5.5 7.6 7.6M16.4 16.4l2.1 2.1M18.5 5.5 16.4 7.6M7.6 16.4 5.5 18.5"/>',
+   sub:()=>'ADHD × INTP 执行协议'}
+];
+
+/* ---------- 侧边栏 / Tab 渲染 ---------- */
+function renderNav(){
+  const nav = $('#nav');
+  const groups = ['执行','资产','工具','关于我'];
+  let html = '';
+  groups.forEach(g=>{
+    const items = VIEWS.filter(v=>v.group===g);
+    if(!items.length) return;
+    html += '<div class="sec">'+g+'</div>';
+    items.forEach(v=>{
+      let nb = '';
+      try{ nb = typeof v.badge==='function' ? v.badge() : ''; }catch(e){ nb=''; }
+      html += `<button data-view="${v.key}" class="${VIEW===v.key?'on':''}">
+        <svg viewBox="0 0 24 24">${v.icon}</svg><span>${v.label}</span>${nb?`<span class="nb">${esc(nb)}</span>`:''}</button>`;
+    });
+  });
+  nav.innerHTML = html;
+
+  const mob = $('#mobtab');
+  mob.innerHTML = VIEWS.map(v=>
+    `<button data-view="${v.key}" class="${VIEW===v.key?'on':''}">
+      <svg viewBox="0 0 24 24">${v.icon}</svg><span>${v.short||v.label.slice(0,2)}</span></button>`).join('');
+}
+
+function renderTop(){
+  const v = VIEWS.find(x=>x.key===VIEW) || VIEWS[0];
+  $('#pageTitle').textContent = v.label;
+  $('#pageSub').textContent = typeof v.sub==='function' ? v.sub() : '';
+  const box = $('#topTools');
+  if(VIEW==='kanban')      box.innerHTML = '<button class="btn" data-act="addTarget">+ 新建目标</button>';
+  else if(VIEW==='today')  box.innerHTML = '<button class="btn" data-act="addTask">+ 加一条</button>';
+  else if(VIEW==='res')    box.innerHTML = '<button class="btn ghost" data-act="toggleAllRes">全部标记完成</button>';
+  else if(VIEW==='sprint') box.innerHTML = '<button class="btn ghost" data-act="resetSprint">重置清单进度</button>';
+  else if(VIEW==='jdmap')  box.innerHTML = '<button class="btn" data-act="go" data-view="sprint">去补齐缺口</button>';
+  else if(VIEW==='canvas') box.innerHTML =
+      '<button class="btn" data-act="genMap">一键生成思维导图</button>'+
+      '<button class="btn ghost" data-act="genFlow">生成流程图</button>'+
+      '<button class="btn ghost" data-act="fit">适应窗口</button>'+
+      '<button class="btn ghost" data-act="exportSVG">导出 SVG</button>'+
+      '<button class="btn ghost" data-act="exportPNG">导出 PNG</button>';
+  else box.innerHTML = '';
+}
+
+/* =======================================================================
+   模块 1 · 今日要处理
+   ======================================================================= */
+function collectAlerts(){
+  const t = todayStr();
+  const out = [];
+  // 逾期目标
+  state.targets.forEach(g=>{
+    if(g.status==='done' || !g.due) return;
+    const d = daysBetween(t, g.due);
+    if(d < 0) out.push({kind:'target', id:g.id, title:g.title, meta:'目标逾期 '+(-d)+' 天 · '+g.stage, level:'bad', tag:g.pri});
+    else if(d === 0) out.push({kind:'target', id:g.id, title:g.title, meta:'今天到期 · '+g.stage, level:'warn', tag:g.pri});
+    else if(d <= 2) out.push({kind:'target', id:g.id, title:g.title, meta:d+' 天后到期 · '+g.stage, level:'warn', tag:g.pri});
+  });
+  // 逾期任务
+  state.tasks.forEach(k=>{
+    if(k.status==='done' || !k.due) return;
+    const d = daysBetween(t, k.due);
+    if(d < 0) out.push({kind:'task', id:k.id, title:k.title, meta:'待办逾期 '+(-d)+' 天 · '+k.src, level:'bad', tag:k.pri});
+    else if(d === 0) out.push({kind:'task', id:k.id, title:k.title, meta:'今天要做 · '+k.src, level:'warn', tag:k.pri});
+  });
+  const order = {bad:0, warn:1};
+  out.sort((a,b)=> order[a.level]-order[b.level]);
+  return out;
+}
+
+/* ---------- 今日唯一焦点（ADHD 友好：一屏只给一个动作） ---------- */
+function pickFocus(){
+  const alerts = collectAlerts();
+  const bad = alerts.find(a=>a.level==='bad');
+  if(bad) return {level:'bad', label:'先清掉这条逾期的', title:bad.title, meta:bad.meta, kind:bad.kind, id:bad.id};
+  const sp = (state.sprint||[]).find(x=>!x.done);
+  if(sp) return {level:'norm', label:'今日冲刺产出物 · '+sp.day, title:sp.out,
+                 meta:sp.title+' · 预计 '+sp.hours+' · 截止 '+fmtMD(sp.due), sprintId:sp.id};
+  if(alerts.length) return {level:'warn', label:'今天到期', title:alerts[0].title, meta:alerts[0].meta,
+                            kind:alerts[0].kind, id:alerts[0].id};
+  return null;
+}
+
+function renderToday(){
+  const el = $('#views');
+  const alerts = collectAlerts();
+  const t = todayStr();
+  const active = state.targets.filter(g=>g.status!=='done');
+  const done  = state.targets.filter(g=>g.status==='done');
+  const total = state.targets.length || 1;
+  const pct = Math.round(done.length/total*100);
+  const dayIdx = Math.max(1, daysBetween(START_DATE, t)+1);
+
+  let h = '<div class="view">';
+
+  /* 唯一焦点 */
+  const f = pickFocus();
+  if(f){
+    const cls = f.level==='bad' ? ' bad' : f.level==='warn' ? ' warn' : '';
+    h += `<div class="focus${cls}">
+      <div class="focus-l">${esc(f.label)}</div>
+      <div class="focus-t">${esc(f.title)}</div>
+      <div class="focus-m">${esc(f.meta)}</div>
+      <div class="focus-act">
+        ${f.kind?`<button class="btn" data-act="${f.kind==='target'?'doneTarget':'doneTask'}" data-id="${f.id}">处理掉它</button>`:''}
+        ${f.sprintId?`<button class="btn" data-act="doneSprint" data-id="${f.sprintId}">标记产出完成</button>`:''}
+        <button class="btn ghost" data-act="go" data-view="sprint">看 14 天冲刺清单</button>
+      </div>
+    </div>`;
+  }
+
+  /* 统计 */
+  h += `<div class="stats">
+    <div class="stat"><div class="l">计划进度</div><div class="v">${dayIdx}<small>/ 21 天</small></div>
+      <div class="b"><i style="width:${Math.min(100,dayIdx/21*100)}%"></i></div></div>
+    <div class="stat"><div class="l">目标完成</div><div class="v">${done.length}<small>/ ${state.targets.length}</small></div>
+      <div class="b"><i style="width:${pct}%"></i></div></div>
+    <div class="stat"><div class="l">待处理提醒</div><div class="v" style="color:${alerts.length?'var(--bad)':'var(--ok)'}">${alerts.length}<small> 条</small></div>
+      <div class="b"><i style="width:${alerts.length?Math.min(100,alerts.length*20):0}%"></i></div></div>
+    <div class="stat"><div class="l">冲刺未完</div><div class="v">${(state.sprint||[]).filter(x=>!x.done).length}<small>/ ${(state.sprint||[]).length} 天</small></div>
+      <div class="b"><i style="width:${(state.sprint||[]).length?Math.round((state.sprint.filter(x=>x.done).length/state.sprint.length)*100):0}%"></i></div></div>
+  </div>`;
+
+  /* 今天要处理 */
+  if(alerts.length){
+    h += `<div class="g-alert"><h4><svg viewBox="0 0 24 24"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>
+      今天要处理（${alerts.length}）</h4>`;
+    alerts.slice(0,8).forEach(a=>{
+      const cls = a.kind==='target' ? 'doneTarget' : 'doneTask';
+      h += `<div class="alert-row">
+        <span class="chip ${a.level==='bad'?'p0':'p1'}">${a.tag||'—'}</span>
+        <div class="t"><b>${esc(a.title)}</b><div class="m">${esc(a.meta)}</div></div>
+        <button class="btn sm" data-act="${cls}" data-id="${a.id}">处理</button>
+      </div>`;
+    });
+    h += '</div>';
+  }else{
+    h += `<div class="card" style="border-color:var(--ok-bd);background:var(--ok-bg)">
+      <div style="display:flex;align-items:center;gap:9px;font-size:13.5px;font-weight:600;color:var(--ok)">
+      <svg viewBox="0 0 24 24" style="width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M20 6 9 17l-5-5"/></svg>
+      没有逾期项，节奏正常。继续按计划推进即可。</div></div>`;
+  }
+
+  /* 当前阶段 */
+  const si = Math.min(STAGES.length-1, Math.max(1, Math.ceil(dayIdx/5)));
+  const curStage = STAGES[si];
+  h += `<div class="card"><div class="card-h"><h3>当前阶段</h3><div class="sp"></div>
+    <span class="chip grey">第 ${dayIdx} 天 / 21</span></div>
+    <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--pri-bg);border-radius:var(--r-s);border:1px solid var(--pri-bd)">
+      <div style="width:4px;height:44px;border-radius:4px;background:${curStage.color};flex:0 0 4px"></div>
+      <div><div style="font-size:14px;font-weight:650">${esc(curStage.name)}</div>
+      <div style="font-size:12px;color:var(--ink-2);margin-top:2px">${esc(curStage.goal)}</div></div>
+    </div></div>`;
+
+  /* 今日待办 */
+  const tk = state.tasks.filter(k=>k.status!=='done');
+  h += `<div class="card"><div class="card-h"><h3>待办清单</h3><div class="sp"></div>
+    <span class="tag">${tk.length} 条未完成</span></div>`;
+  if(!tk.length){
+    h += '<div style="font-size:13px;color:var(--ink-3);padding:14px 0;text-align:center">暂无待办，点右上角「+ 加一条」添加。</div>';
+  }else{
+    h += '<div id="taskList">';
+    tk.forEach(k=>{
+      const over = k.due && daysBetween(todayStr(), k.due) < 0;
+      h += `<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line-2)">
+        <button class="done-btn" data-act="doneTask" data-id="${k.id}"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></button>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13.5px;${over?'color:var(--bad)':''}">${esc(k.title)}</div>
+          <div style="font-size:11px;color:var(--ink-3);margin-top:1px">
+            <span class="chip ${k.pri==='P0'?'p0':k.pri==='P1'?'p1':'p2'}">${k.pri}</span>
+            <span style="margin-left:6px">${esc(k.src||'')}</span>
+            ${k.due?'<span style="margin-left:6px">· '+fmtMD(k.due)+(over?' 已逾期':'')+'</span>':''}
+          </div>
+        </div>
+        <button class="btn ghost sm" data-act="delTask" data-id="${k.id}">删除</button>
+      </div>`;
+    });
+    h += '</div>';
+  }
+  const doneTk = state.tasks.filter(k=>k.status==='done');
+  if(doneTk.length){
+    h += `<div style="margin-top:12px;font-size:11.5px;color:var(--ink-3)">已完成 ${doneTk.length} 条 ·
+      <button data-act="clearDoneTasks" style="color:var(--ink-3);text-decoration:underline;font-size:11.5px">清除已完成</button></div>`;
+  }
+  h += '</div>';
+
+  /* 快捷跳转 */
+  h += `<div class="card"><div class="card-h"><h3>快速入口</h3><div class="sp"></div>
+    <span class="tag">${VIEWS.length-1} 个模块</span></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      ${VIEWS.filter(v=>v.key!=='today').map(v=>
+        `<button class="btn ghost sm" data-act="go" data-view="${v.key}">${v.label}</button>`).join('')}
+    </div></div>`;
+
+  /* 数据量提示（铁律：累计到一定量温和提醒备份） */
+  const cnt = state.targets.length + state.tasks.length + state.resources.filter(r=>r.done).length;
+  if(cnt >= 30){
+    h += `<div class="card" style="background:var(--warn-bg);border-color:var(--warn-bd)">
+      <div style="display:flex;align-items:center;gap:9px;font-size:12.5px;color:var(--ink-2)">
+        <svg viewBox="0 0 24 24" style="width:16px;height:16px;flex:0 0 16px;stroke:var(--warn);fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round"><path d="M12 9v4M12 17h.01"/><circle cx="12" cy="12" r="9"/></svg>
+        <span>数据已积累 <b>${cnt}</b> 条，建议点左下角「导出备份」存一份快照，换设备或清缓存后可导入恢复。</span>
+      </div></div>`;
+  }
+
+  h += '</div>';
+  el.innerHTML = h;
+}
+
+/* =======================================================================
+   模块 2 · 目标看板（拖拽四栏）
+   ======================================================================= */
+const COLS = [
+  {key:'todo',  label:'待启动',  dot:'#8C8179'},
+  {key:'doing', label:'进行中',  dot:'#2C6E9B'},
+  {key:'done',  label:'已完成',  dot:'#2F855A'},
+  {key:'block', label:'卡住了',  dot:'#C53030'}
+];
+
+function renderKanban(){
+  const el = $('#views');
+  let h = '<div class="view">';
+
+  // 阶段进度概览
+  h += '<div class="card"><div class="card-h"><h3>阶段进度</h3><div class="sp"></div><span class="tag">按阶段聚合</span></div>';
+  STAGES.forEach(s=>{
+    const items = state.targets.filter(g=>g.stage===s.key);
+    const dn = items.filter(g=>g.status==='done').length;
+    const pct = items.length ? Math.round(dn/items.length*100) : 0;
+    h += `<div style="margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:8px;font-size:12.5px;margin-bottom:4px">
+        <span style="width:7px;height:7px;border-radius:50%;background:${s.color};display:inline-block"></span>
+        <b style="font-weight:600">${esc(s.name)}</b>
+        <span style="color:var(--ink-3);font-size:11px">${esc(s.days)}</span>
+        <span style="margin-left:auto;color:var(--ink-3);font-size:11.5px">${dn}/${items.length} · ${pct}%</span>
+      </div>
+      <div style="height:6px;background:var(--line-2);border-radius:4px;overflow:hidden">
+        <i style="display:block;height:100%;width:${pct}%;background:${s.color};border-radius:4px;transition:width .5s"></i></div>
+    </div>`;
+  });
+  h += '</div>';
+
+  // 四栏看板
+  h += '<div class="kanban" id="kanban">';
+  COLS.forEach(c=>{
+    const items = state.targets.filter(g=>g.status===c.key);
+    h += `<div class="col" data-col="${c.key}">
+      <div class="col-h"><span class="c-dot" style="background:${c.dot}"></span>
+        <span class="c-t">${c.label}</span><span class="c-n">${items.length}</span></div>`;
+    items.forEach(g=>{
+      const over = g.due && daysBetween(todayStr(), g.due) < 0 && g.status!=='done';
+      h += `<div class="kcard" draggable="true" data-id="${g.id}" style="border-left-color:${c.dot}">
+        <div class="kt">${esc(g.title)}</div>
+        <div class="km">
+          <span class="chip ${g.pri==='P0'?'p0':g.pri==='P1'?'p1':'p2'}">${g.pri}</span>
+          ${g.stage?'<span>'+esc(g.stage)+'</span>':''}
+          ${g.due?'<span style="'+(over?'color:var(--bad);font-weight:600':'')+'">'+fmtMD(g.due)+(over?' 逾期':'')+'</span>':''}
+        </div>
+        ${g.res?'<div style="font-size:11px;color:var(--ink-3);margin-top:5px;padding-top:5px;border-top:1px dashed var(--line)">产出：'+esc(g.res)+'</div>':''}
+      </div>`;
+    });
+    if(!items.length) h += '<div style="font-size:12px;color:var(--ink-3);text-align:center;padding:16px 0">拖目标到这里</div>';
+    h += '</div>';
+  });
+  h += '</div>';
+
+  h += '<div style="font-size:11.5px;color:var(--ink-3);margin-top:12px;padding:0 4px">提示：卡片可直接拖拽到其他栏，状态会实时保存。所有目标以「产出物可验收」为标准。</div>';
+  h += '</div>';
+  el.innerHTML = h;
+  bindKanbanDnD();
+}
+
+function bindKanbanDnD(){
+  let dragId = null;
+  $$('#kanban .kcard').forEach(card=>{
+    card.addEventListener('dragstart', e=>{
+      dragId = card.dataset.id;
+      card.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+      try{ e.dataTransfer.setData('text/plain', dragId); }catch(_){}
+    });
+    card.addEventListener('dragend', ()=>{
+      card.classList.remove('dragging');
+      $$('#kanban .col').forEach(c=>c.classList.remove('over'));
+      dragId = null;
+    });
+  });
+  $$('#kanban .col').forEach(col=>{
+    col.addEventListener('dragover', e=>{ e.preventDefault(); e.dataTransfer.dropEffect='move'; col.classList.add('over'); });
+    col.addEventListener('dragleave', ()=>col.classList.remove('over'));
+    col.addEventListener('drop', e=>{
+      e.preventDefault();
+      col.classList.remove('over');
+      const id = dragId || (e.dataTransfer && e.dataTransfer.getData('text/plain'));
+      if(!id) return;
+      moveTarget(id, col.dataset.col);
+    });
+  });
+}
+
+/* =======================================================================
+   模块 3 · 21 天计划
+   ======================================================================= */
+function renderPlan(){
+  const el = $('#views');
+  const dayIdx = Math.max(0, daysBetween(START_DATE, todayStr())+1);
+  let h = '<div class="view">';
+
+  h += `<div class="card"><div class="card-h"><h3>计划轴</h3><div class="sp"></div>
+    <span class="tag">起算 ${START_DATE} · 共 21 天</span></div>
+    <div style="position:relative;padding:6px 0">
+      <div style="height:6px;background:var(--line-2);border-radius:4px;position:relative;overflow:hidden">
+        <i style="position:absolute;left:0;top:0;height:100%;width:${Math.min(100,dayIdx/21*100)}%;background:linear-gradient(90deg,var(--pri-l),var(--pri));border-radius:4px;transition:width .5s"></i></div>
+      <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:10.5px;color:var(--ink-3)">
+        <span>D0</span><span>D5</span><span>D11</span><span>D16</span><span>D21</span></div>
+    </div>
+    <div style="margin-top:10px;font-size:12.5px;color:var(--ink-2)">
+      今天是计划第 <b style="color:var(--pri)">${dayIdx>0?dayIdx:0}</b> 天
+      ${dayIdx<=0?'（尚未开始，明天起算）':dayIdx>21?'（计划周期已过，建议复盘后开新一轮）':''}
+    </div></div>`;
+
+  STAGES.forEach((s,i)=>{
+    const items = state.targets.filter(g=>g.stage===s.key);
+    const dn = items.filter(g=>g.status==='done').length;
+    const pct = items.length?Math.round(dn/items.length*100):0;
+    h += `<div class="card" style="border-left:4px solid ${s.color}">
+      <div class="card-h">
+        <h3 style="color:${s.color}">${esc(s.name)}</h3>
+        <span class="chip grey">${esc(s.days)} · ${esc(s.range)}</span>
+        <div class="sp"></div>
+        <span style="font-size:11.5px;color:var(--ink-3)">${dn}/${items.length}</span>
+      </div>
+      <div style="height:5px;background:var(--line-2);border-radius:4px;overflow:hidden;margin-bottom:11px">
+        <i style="display:block;height:100%;width:${pct}%;background:${s.color};border-radius:4px"></i></div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px" class="plan-2col">
+        <div>
+          <div style="font-size:11px;color:var(--ink-3);letter-spacing:.6px;font-weight:600;margin-bottom:6px">关键动作</div>
+          ${s.tasks.map(t=>`<div style="display:flex;gap:7px;font-size:12.5px;color:var(--ink-2);margin-bottom:5px;line-height:1.5">
+            <span style="color:${s.color};flex:0 0 auto">—</span><span>${esc(t)}</span></div>`).join('')}
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--ink-3);letter-spacing:.6px;font-weight:600;margin-bottom:6px">阶段目标（可验收）</div>
+          ${items.length?items.map(g=>`<div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:6px">
+            <button class="done-btn ${g.status==='done'?'on':''}" data-act="doneTarget" data-id="${g.id}" style="margin-top:2px">
+              <svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></button>
+            <div style="flex:1;min-width:0">
+              <div style="font-size:12.5px;${g.status==='done'?'text-decoration:line-through;color:var(--ink-3)':''}">${esc(g.title)}</div>
+              ${g.res?'<div style="font-size:10.5px;color:var(--ink-3);margin-top:1px">产出：'+esc(g.res)+'</div>':''}
+            </div></div>`).join(''):'<div style="font-size:12px;color:var(--ink-3)">（无目标）</div>'}
+        </div>
+      </div>
+
+      <div style="margin-top:12px;padding:10px 12px;background:${s.color}0F;border-radius:var(--r-s);font-size:12.5px;color:var(--ink-2)">
+        <b style="color:${s.color}">阶段目标：</b>${esc(s.goal)}　<b style="color:${s.color}">重点：</b>${esc(s.focus)}
+      </div>
+    </div>`;
+  });
+
+  h += '</div>';
+  el.innerHTML = h;
+}
+
+/* =======================================================================
+   模块 4 · 学习资料（B站 + GitHub）
+   ======================================================================= */
+let RES_FILTER = '全部';
+
+function renderRes(){
+  const el = $('#views');
+  const stages = ['全部', ...STAGES.map(s=>s.key)];
+  const list = state.resources.filter(r=>{
+    if(RES_FILTER==='全部') return true;
+    if(RES_FILTER==='B站') return r.kind==='B站';
+    if(RES_FILTER==='GitHub') return r.kind==='GitHub';
+    return r.stage===RES_FILTER;
+  });
+
+  let h = '<div class="view">';
+  h += `<div class="card"><div class="card-h"><h3>资料筛选</h3><div class="sp"></div>
+    <span class="tag">${list.length} / ${state.resources.length} 条</span></div>
+    <div style="display:flex;gap:7px;flex-wrap:wrap">
+      ${stages.map(s=>`<button class="btn ${RES_FILTER===s?'':'ghost'} sm" data-act="filterRes" data-k="${esc(s)}">${esc(s)}</button>`).join('')}
+      <button class="btn ${RES_FILTER==='B站'?'':'ghost'} sm" data-act="filterRes" data-k="B站">仅 B站</button>
+      <button class="btn ${RES_FILTER==='GitHub'?'':'ghost'} sm" data-act="filterRes" data-k="GitHub">仅 GitHub</button>
+    </div></div>`;
+
+  h += `<div class="card" style="background:var(--info-bg);border-color:var(--info-bd)">
+    <div style="font-size:12.5px;color:var(--ink-2);line-height:1.7">
+      <b style="color:var(--info)">选材原则：</b>不追求"学完"，只追求"能写进简历并被追问时答得上"。
+      全部资料围绕你的 4 个硬缺口（FastAPI / Docker / RAG链路 / Agent）挑选，B站负责"跟着做"，GitHub 负责"看懂实现"。
+      标 <span class="chip p0">P0</span> 的是硬缺口必学，<span class="chip p2">P2</span> 的了解即可、学不完直接跳过。
+    </div></div>`;
+
+  const groups = {};
+  list.forEach(r=>{ (groups[r.stage] = groups[r.stage] || []).push(r); });
+  const order = ['S0 准备','S1 筑基','S2 检索','S3 Agent','S4 收尾','贯穿'];
+  const keys = order.filter(k=>groups[k]);
+  if(!keys.length){
+    h += '<div class="card" style="text-align:center;color:var(--ink-3);font-size:13px;padding:30px">该筛选下暂无资料。</div>';
+  }
+  keys.forEach(k=>{
+    const st = STAGES.find(s=>s.key===k);
+    const col = st ? st.color : '#8C8179';
+    h += `<div class="card"><div class="card-h">
+      <span style="width:8px;height:8px;border-radius:50%;background:${col};display:inline-block"></span>
+      <h3>${esc(k)}</h3><div class="sp"></div><span class="tag">${groups[k].length} 条</span></div>`;
+    groups[k].forEach(r=>{
+      h += `<div style="padding:11px 0;border-bottom:1px solid var(--line-2)">
+        <div style="display:flex;align-items:flex-start;gap:9px">
+          <button class="done-btn ${r.done?'on':''}" data-act="doneRes" data-id="${r.id}" style="margin-top:3px">
+            <svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></button>
+          <div style="flex:1;min-width:0">
+            <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:3px">
+              <span class="chip ${r.kind==='B站'?'p0':r.kind==='GitHub'?'pur':'grey'}">${esc(r.kind)}</span>
+              <span class="chip ${r.pri==='P0'?'p0':r.pri==='P1'?'p1':'p2'}">${r.pri}</span>
+              <span style="font-size:11px;color:var(--ink-3)">${esc(r.type)} · ${esc(r.hours)}</span>
+            </div>
+            <div style="font-size:13.5px;font-weight:600;${r.done?'text-decoration:line-through;color:var(--ink-3)':''}">${esc(r.title)}</div>
+            <div style="font-size:11px;color:var(--ink-3);margin:2px 0 5px">${esc(r.by)}</div>
+            <div style="font-size:12.5px;color:var(--ink-2);line-height:1.6;background:var(--bg);padding:8px 10px;border-radius:var(--r-s);border-left:3px solid ${col}">
+              <b style="color:${col};font-size:11px">为什么推荐给你：</b>${esc(r.why)}</div>
+            <div style="margin-top:7px">
+              <a href="${esc(r.url)}" target="_blank" rel="noopener" style="font-size:12px;color:var(--pri);text-decoration:none;font-weight:550">
+                打开链接 →</a>
+            </div>
+          </div>
+        </div></div>`;
+    });
+    h += '</div>';
+  });
+
+  h += '</div>';
+  el.innerHTML = h;
+}
+
+/* =======================================================================
+   模块 5 · 无限画布（网状思维图 / 流程图 / 框图）
+   ======================================================================= */
+const PALETTE = ['#993C1D','#2C6E9B','#2F855A','#6B46C1','#B7791F','#0E7490'];
+/* 暗色主题下同序号的高亮版（浅底改深底，颜色整体提亮） */
+const PALETTE_DK = ['#F07C5A','#63A9E8','#5FCB8C','#A78BFA','#E0B24C','#3EC6D8'];
+function cvColor(n){
+  const i = (n.color||0) % PALETTE.length;
+  return document.body.dataset.theme === 'light' ? PALETTE[i] : PALETTE_DK[i];
+}
+/* 文本宽度估算（中文按 1em、拉丁按 0.55em），用于节点自适应与截断 */
+function cvTextW(s, size){
+  let w = 0;
+  for(const ch of String(s)){
+    const c = ch.codePointAt(0);
+    const wide = (c>=0x1100&&c<=0x115F)||(c>=0x2E80&&c<=0xA4CF)||(c>=0xAC00&&c<=0xD7A3)
+              ||(c>=0xF900&&c<=0xFAFF)||(c>=0xFE30&&c<=0xFE4F)||(c>=0xFF00&&c<=0xFF60)||(c>=0xFFE0&&c<=0xFFE6);
+    w += wide ? size : size*0.55;
+  }
+  return w;
+}
+/* 贪心折行：拉丁词整体不拆，中日韩逐字可断 */
+function cvWrap(text, maxW, size){
+  const out = [];
+  String(text).split('\n').forEach(seg=>{
+    seg = seg.replace(/\s+$/,'');
+    if(!seg){ out.push(''); return; }
+    const toks = []; let buf = '';
+    for(const ch of seg){
+      if(/[A-Za-z0-9]/.test(ch) || (buf && /[._+\-#/@%&:·–—→()]/.test(ch))) buf += ch;
+      else { if(buf){ toks.push(buf); buf = ''; } toks.push(ch); }
+    }
+    if(buf) toks.push(buf);
+    let line = '';
+    toks.forEach(tk=>{
+      if(line && cvTextW(line+tk, size) > maxW){ out.push(line); line = (tk === ' ' ? '' : tk); }
+      else line += tk;
+    });
+    out.push(line);
+  });
+  return out.length ? out : [''];
+}
+/* 统一的节点度量出口：宽度 → 折行 → 高度。cvPaint / cvPath / cvBuildSVG 共用同一结果 */
+const CV_LINE_CACHE = new Map();
+function cvMetrics(n){
+  const size = 12.5;
+  const raw = String(n.text).split('\n');
+  let w = n.w;
+  if(!w){
+    const need = Math.max(...raw.map(l=>cvTextW(l, size))) + 30;
+    w = Math.max(140, Math.min(260, need));
+  }
+  const key = n.id + '|' + w + '|' + n.text;
+  let lines = CV_LINE_CACHE.get(key);
+  if(!lines){
+    lines = cvWrap(String(n.text), w - 30, size);
+    if(lines.length > 6){ lines = lines.slice(0,6); lines[5] = lines[5].replace(/.{1}$/,'…'); }
+    CV_LINE_CACHE.set(key, lines);
+  }
+  return { w, h: 30 + lines.length*20, lines };
+}
+const CV = { scale:1, tx:0, ty:0, drag:null, panning:false, panStart:null, sel:null, mode:'mind' };
+
+function cvNodeById(id){ return state.canvas.nodes.find(n=>n.id===id); }
+
+function cvEdgesOf(id){
+  return state.canvas.edges.filter(e=>e[0]===id||e[1]===id);
+}
+
+/* 自动布局：分层（BFS 深度 → 列，同层纵向均分） */
+function layoutAuto(){
+  const nodes = state.canvas.nodes;
+  if(!nodes.length) return;
+
+  /* --- 1) 有向分层：Kahn 拓扑 + 最长路径。只沿 a→b 方向推进，绝不回推父节点 --- */
+  const adj = {}, indeg = {};
+  nodes.forEach(n=>{ adj[n.id] = []; indeg[n.id] = 0; });
+  state.canvas.edges.forEach(e=>{ if(adj[e[0]] && indeg[e[1]]!=null){ adj[e[0]].push(e[1]); indeg[e[1]]++; } });
+  const depth = {}; nodes.forEach(n=>depth[n.id]=0);
+  let q = nodes.filter(n=>indeg[n.id]===0).map(n=>n.id);
+  if(!q.length) q = [nodes[0].id];
+  const pending = Object.assign({}, indeg);
+  while(q.length){
+    const cur = q.shift();
+    (adj[cur]||[]).forEach(nxt=>{
+      if(depth[nxt] < depth[cur]+1) depth[nxt] = depth[cur]+1;
+      if(--pending[nxt] === 0) q.push(nxt);
+    });
+  }
+
+  /* --- 2) 同层按「父节点」分组成子列：同一父节点的子节点排在同一条竖列 --- */
+  const COL_W = 300, SUB_W = 236, GAP_Y = 24, ROWS_MAX = 8;
+  const byDepth = {};
+  nodes.forEach(n=>{ const d=depth[n.id]; (byDepth[d]=byDepth[d]||[]).push(n); });
+  Object.keys(byDepth).sort((a,b)=>a-b).forEach(d=>{
+    const arr = byDepth[d];
+    const bucket = [], keyOf = {};
+    arr.forEach(n=>{
+      let pid = null;
+      state.canvas.edges.forEach(e=>{ if(pid===null && e[1]===n.id) pid = e[0]; });
+      const k = (pid===null ? 'solo:'+n.id : pid);
+      if(!keyOf[k]){ keyOf[k] = []; bucket.push(keyOf[k]); }
+      keyOf[k].push(n);
+    });
+    const groups = [];
+    bucket.forEach(g=>{
+      if(g.length <= ROWS_MAX) groups.push(g);
+      else for(let i=0;i<g.length;i+=ROWS_MAX) groups.push(g.slice(i,i+ROWS_MAX));
+    });
+    /* --- 3) 子列内按各节点实际高度紧凑堆叠，纵向居中 --- */
+    groups.forEach((grp, gi)=>{
+      const hs = grp.map(n=>cvNodeSize(n).h);
+      const totalH = hs.reduce((a,b)=>a+b,0) + (grp.length-1)*GAP_Y;
+      let cy = 300 - totalH/2;
+      grp.forEach((n,i)=>{
+        n.x = 60 + Number(d)*COL_W + gi*SUB_W;
+        n.y = cy;
+        cy += hs[i] + GAP_Y;
+      });
+    });
+  });
+}
+
+function cvNodeSize(n){
+  const m = cvMetrics(n);
+  return {w:m.w, h:m.h};
+}
+
+function cvPath(a, b){
+  const A = cvNodeSize(a), B = cvNodeSize(b);
+  const ax = a.x + A.w, ay = a.y + A.h/2;
+  const bx = b.x, by = b.y + B.h/2;
+  const dx = Math.max(36, Math.abs(bx-ax)*0.45);
+  return `M${ax} ${ay} C${ax+dx} ${ay}, ${bx-dx} ${by}, ${bx} ${by}`;
+}
+
+function renderCanvas(){
+  const el = $('#views');
+  const lib = state.canvas.nodes.length;
+  let h = `<div class="view">
+  <div class="card" style="padding:12px 14px">
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:12.5px;color:var(--ink-2)">
+      <b>无限画布</b>
+      <span class="chip grey" id="cvCountN">${lib} 个节点</span>
+      <span class="chip grey" id="cvCountE">${state.canvas.edges.length} 条连线</span>
+      <div class="sp" style="flex:1"></div>
+      <button class="btn ghost sm" data-act="addNode">+ 加节点</button>
+      <button class="btn ghost sm" data-act="connectMode">连线模式</button>
+      <button class="btn ghost sm" data-act="layout">自动布局</button>
+      <button class="btn ghost sm" data-act="clearCanvas">清空画布</button>
+    </div>
+    <div style="margin-top:9px;font-size:11.5px;color:var(--ink-3);line-height:1.7">
+      拖空白处平移 · 滚轮缩放 · 拖节点移动（会自动吸附对齐）· 双击节点改文字 ·
+      选中节点后点「连线模式」再点另一个节点即可连线。导出 SVG 可直接贴进 Markdown / 简历附件。
+    </div>
+  </div>
+  <div class="card" style="padding:10px 14px">
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+      <span style="font-size:11.5px;color:var(--ink-3);font-weight:600">一键生成：</span>
+      ${STAGES.map((s,i)=>`<button class="btn ghost sm" data-act="genStage" data-k="${esc(s.key)}">
+        <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${s.color};margin-right:5px"></span>${esc(s.key)} 导图</button>`).join('')}
+      <button class="btn ghost sm" data-act="genFlow">求职流程框图</button>
+      <button class="btn ghost sm" data-act="genFromPlan">由 21 天计划生成全图</button>
+    </div>
+  </div>
+  <div class="card" style="padding:0;overflow:hidden;position:relative">
+    <div id="cvWrap" style="position:relative;width:100%;height:min(66vh,620px);background:
+      radial-gradient(circle at 1px 1px, var(--cv-dot) 1px, transparent 0) 0 0/22px 22px, var(--bg);
+      cursor:grab;overflow:hidden;touch-action:none">
+      <svg id="cvSvg" width="100%" height="100%" style="display:block"><g id="cvG"></g></svg>
+      <div id="cvHint" style="position:absolute;left:12px;bottom:10px;font-size:11px;color:var(--ink-2);
+        background:var(--cv-hint);padding:4px 9px;border-radius:7px;border:1px solid var(--line)"></div>
+      <div style="position:absolute;right:12px;bottom:10px;display:flex;gap:6px">
+        <button class="btn ghost sm" data-act="zin">＋</button>
+        <button class="btn ghost sm" data-act="zout">－</button>
+        <button class="btn ghost sm" data-act="zreset" title="恢复到 100% 并居中">重置</button>
+      </div>
+    </div>
+  </div></div>`;
+  el.innerHTML = h;
+  cvBind();
+  cvPaint();
+}
+
+function cvPaint(){
+  const g = document.getElementById('cvG');
+  if(!g) return;
+  g.setAttribute('transform', `translate(${CV.tx},${CV.ty}) scale(${CV.scale})`);
+  const idMap = {}; state.canvas.nodes.forEach(n=>idMap[n.id]=n);
+
+  let html = '';
+  /* 连线 */
+  state.canvas.edges.forEach((e,idx)=>{
+    const a = idMap[e[0]], b = idMap[e[1]];
+    if(!a||!b) return;
+    html += `<path d="${cvPath(a,b)}" style="fill:none;stroke:var(--cv-edge)" stroke-width="1.8" marker-end="url(#arw)"/>`;
+  });
+  /* 节点 */
+  state.canvas.nodes.forEach(n=>{
+    const s = cvNodeSize(n);
+    const c = cvColor(n);
+    const isRoot = n.type==='root';
+    const isLeaf = n.type==='leaf';
+    const alpha = document.body.dataset.theme === 'light' ? '14' : '24';
+    const fill = isRoot ? c : (isLeaf ? 'var(--cv-leaf)' : c+alpha);
+    const stroke = c;
+    const lines = cvMetrics(n).lines;
+    html += `<g class="cvn" data-id="${n.id}" style="cursor:grab">
+      <rect x="${n.x}" y="${n.y}" width="${s.w}" height="${s.h}" rx="${isRoot?12:9}"
+        style="fill:${fill};stroke:${stroke}" stroke-width="${isRoot?2:1.5}"
+        ${isRoot?'':'filter="url(#soft)"'}/>
+      ${lines.map((l,i)=>{
+        if(i===0) return `<text x="${n.x+15}" y="${n.y+21}" font-size="12.5" font-weight="${isRoot||!isLeaf?650:500}"
+          style="fill:${isRoot?'#FFFFFF':c}" font-family="inherit">${esc(l)}</text>`;
+        return `<text x="${n.x+15}" y="${n.y+21+i*19}" font-size="11.5" style="fill:${isRoot?'#FFFFFF':'var(--cv-leaf-ink)'};opacity:${isRoot?0.88:1}" font-family="inherit">${esc(l)}</text>`;
+      }).join('')}
+    </g>`;
+  });
+
+  g.innerHTML = `<defs>
+      <marker id="arw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+        <path d="M0 0 L10 5 L0 10 z" style="fill:var(--cv-edge)"/></marker>
+      <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+        <feDropShadow dx="0" dy="1" stdDeviation="1.6" style="flood-color:var(--cv-shadow)" flood-opacity="0.18"/></filter>
+    </defs>` + html;
+
+  const hint = document.getElementById('cvHint');
+  if(hint) hint.textContent = `缩放 ${Math.round(CV.scale*100)}%`;
+  // 实时同步计数（cvPaint 是画布唯一渲染出口，安全）
+  const cn = document.getElementById('cvCountN');
+  const ce = document.getElementById('cvCountE');
+  if(cn) cn.textContent = state.canvas.nodes.length + ' 个节点';
+  if(ce) ce.textContent = state.canvas.edges.length + ' 条连线';
+}
+
+function cvBind(){
+  const wrap = document.getElementById('cvWrap');
+  if(!wrap || wrap.dataset.bound) return;
+  wrap.dataset.bound = '1';
+
+  wrap.querySelectorAll('.cvn').forEach(()=>{});
+  wrap.addEventListener('pointerdown', e=>{
+    const nodeEl = e.target.closest('.cvn');
+    if(nodeEl){
+      const id = nodeEl.dataset.id;
+      if(wrap.dataset.connect==='1'){
+        if(CV.sel && CV.sel!==id){
+          state.canvas.edges.push([CV.sel, id]);
+          CV.sel = null; wrap.dataset.connect='0';
+          saveData(); cvPaint(); toast('已连线');
+        }else{
+          CV.sel = id; cvPaint(); toast('已选择起点，再点一个节点');
+        }
+        return;
+      }
+      if(e.detail===2){ cvEditText(id); return; }
+      const n = cvNodeById(id);
+      CV.drag = {id, sx:e.clientX, sy:e.clientY, ox:n.x, oy:n.y, moved:false};
+      wrap.setPointerCapture(e.pointerId);
+      return;
+    }
+    CV.panning = true;
+    CV.panStart = {x:e.clientX, y:e.clientY, tx:CV.tx, ty:CV.ty};
+    wrap.style.cursor = 'grabbing';
+    wrap.setPointerCapture(e.pointerId);
+  });
+
+  wrap.addEventListener('pointermove', e=>{
+    if(CV.drag){
+      const n = cvNodeById(CV.drag.id);
+      if(!n) return;
+      const nx = CV.drag.ox + (e.clientX-CV.drag.sx)/CV.scale;
+      const ny = CV.drag.oy + (e.clientY-CV.drag.sy)/CV.scale;
+      if(Math.abs(e.clientX-CV.drag.sx)>2 || Math.abs(e.clientY-CV.drag.sy)>2) CV.drag.moved = true;
+      n.x = Math.round(nx/14)*14;   // 吸附对齐网格
+      n.y = Math.round(ny/14)*14;
+      cvPaint();
+    }else if(CV.panning){
+      CV.tx = CV.panStart.tx + (e.clientX-CV.panStart.x);
+      CV.ty = CV.panStart.ty + (e.clientY-CV.panStart.y);
+      cvPaint();
+    }
+  });
+
+  const end = e=>{
+    if(CV.drag){
+      if(CV.drag.moved){ saveData(); } else { CV.sel = CV.drag.id; }
+      CV.drag = null;
+    }
+    if(CV.panning){ CV.panning = false; wrap.style.cursor='grab'; }
+  };
+  wrap.addEventListener('pointerup', end);
+  wrap.addEventListener('pointercancel', end);
+
+  wrap.addEventListener('wheel', e=>{
+    e.preventDefault();
+    const rect = wrap.getBoundingClientRect();
+    const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+    const old = CV.scale;
+    const next = Math.min(2.4, Math.max(0.3, old * (e.deltaY<0 ? 1.12 : 0.89)));
+    CV.tx = mx - (mx - CV.tx) * (next/old);
+    CV.ty = my - (my - CV.ty) * (next/old);
+    CV.scale = next;
+    cvPaint();
+  }, {passive:false});
+}
+
+function cvEditText(id){
+  const n = cvNodeById(id);
+  if(!n) return;
+  const v = prompt('编辑节点文字（换行请用 \\n）：', n.text);
+  if(v===null) return;
+  n.text = v.replace(/\\n/g,'\n');
+  saveData(); cvPaint();
+}
+
+/* ---------- 一键生成：阶段思维导图 ---------- */
+function genStageMap(stageKey){
+  const st = STAGES.find(s=>s.key===stageKey);
+  if(!st) return;
+  const colorIdx = STAGES.indexOf(st);
+  const nodes = [];
+  const edges = [];
+  const rootId = 'n'+Date.now().toString(36)+'r';
+  nodes.push({id:rootId, x:0, y:0, w:214, text:st.name, type:'root', color:colorIdx});
+  st.tasks.forEach((t,i)=>{
+    const id = 'n'+Date.now().toString(36)+i;
+    nodes.push({id, x:0, y:0, w:214, text:t, type:'leaf', color:colorIdx});
+    edges.push([rootId, id]);
+  });
+  const g = state.targets.filter(x=>x.stage===stageKey);
+  g.forEach((x,i)=>{
+    const id = 'n'+Date.now().toString(36)+'g'+i;
+    nodes.push({id, x:0, y:0, w:224, text:'✅ '+x.title+(x.res?'\\n产出：'+x.res:''), type:'branch', color:colorIdx});
+    edges.push([rootId, id]);
+  });
+  state.canvas.nodes = nodes;
+  state.canvas.edges = edges;
+  layoutAuto();
+  CV.scale = 1; CV.tx = 10; CV.ty = 10;
+  saveData(); cvPaint(); layoutFit();
+  toast('已生成「'+st.name+'」思维导图');
+}
+
+/* ---------- 一键生成：求职流程框图 ---------- */
+function genFlow(){
+  const steps = [
+    ['能力盘点','✓ 已完成','#2F855A'],
+    ['话术准备 D0','12 处断言打磨','#2C6E9B'],
+    ['S1 筑基 D1–5','FastAPI·Docker·Redis','#2C6E9B'],
+    ['S2 检索 D6–11','RAG 全链路·分块·混合检索','#2F855A'],
+    ['S3 Agent D12–16','FunctionCalling·LangGraph·MCP','#6B46C1'],
+    ['S4 收尾 D17–21','评测·作品集·简历3.0','#993C1D'],
+    ['定向投递','杭州 8–11K · AI应用/RAG/Python','#993C1D']
+  ];
+  const nodes = [], edges = [];
+  /* 蛇形排布：每行 4 个，奇偶行反向，连接线最短 */
+  const PER = 4, SX = 300, SY = 150;
+  steps.forEach((s,i)=>{
+    const id = 'f'+Date.now().toString(36)+i;
+    const r = Math.floor(i/PER), k = i % PER;
+    const cx = (r % 2 === 0) ? k : (PER - 1 - k);
+    nodes.push({id, x:60+cx*SX, y:130+r*SY, w:214, text:s[0]+'\n'+s[1],
+      type: i===0?'root':(i===steps.length-1?'root':'branch'),
+      color: PALETTE.indexOf(s[2])>=0?PALETTE.indexOf(s[2]):i%5});
+    if(i>0) edges.push([nodes[i-1].id, id]);
+  });
+  state.canvas.nodes = nodes;
+  state.canvas.edges = edges;
+  saveData(); cvPaint(); layoutFit();
+  toast('已生成求职流程框图（共 '+nodes.length+' 节点）');
+}
+
+/* ---------- 一键生成：由 21 天计划生成全图 ---------- */
+function genFromPlan(){
+  const nodes = [], edges = [];
+  const rootId = 'p'+Date.now().toString(36)+'root';
+  nodes.push({id:rootId, x:0, y:0, w:214, text:'AI 转型 21 天\n目标：杭州 8–11K', type:'root', color:0});
+  STAGES.forEach((s,i)=>{
+    const sid = 'p'+Date.now().toString(36)+'s'+i;
+    nodes.push({id:sid, x:0, y:0, w:214, text:s.name+'\n'+s.days+' · '+s.focus, type:'branch', color:i});
+    edges.push([rootId, sid]);
+    s.tasks.slice(0,4).forEach((t,j)=>{
+      const tid = 'p'+Date.now().toString(36)+'t'+i+'_'+j;
+      nodes.push({id:tid, x:0, y:0, w:214, text:t, type:'leaf', color:i});
+      edges.push([sid, tid]);
+    });
+  });
+  state.canvas.nodes = nodes;
+  state.canvas.edges = edges;
+  layoutAuto();
+  saveData(); cvPaint(); layoutFit();
+  toast('已由 21 天计划生成完整网状图（'+nodes.length+' 节点）');
+}
+
+function layoutFit(){
+  const wrap = document.getElementById('cvWrap');
+  if(!wrap || !state.canvas.nodes.length) return;
+  let minX=1e9,minY=1e9,maxX=-1e9,maxY=-1e9;
+  state.canvas.nodes.forEach(n=>{
+    const s = cvNodeSize(n);
+    minX = Math.min(minX,n.x); minY = Math.min(minY,n.y);
+    maxX = Math.max(maxX,n.x+s.w); maxY = Math.max(maxY,n.y+s.h);
+  });
+  const pad = 44;
+  const W = wrap.clientWidth, H = wrap.clientHeight;
+  const z = Math.min((W-pad*2)/(maxX-minX), (H-pad*2)/(maxY-minY));
+  // 设下限，避免图太大时缩到不可读（宁可溢出可分页拖拽，也不要看不清）
+  CV.scale = Math.max(0.6, Math.min(z, 1.5));
+  const cw = (maxX-minX)*CV.scale, ch = (maxY-minY)*CV.scale;
+  CV.tx = pad - minX*CV.scale + Math.max(0,(W-pad*2-cw))/2;
+  CV.ty = pad - minY*CV.scale + Math.max(0,(H-pad*2-ch))/2;
+  cvPaint();
+}
+
+/* ---------- 导出 SVG / PNG ---------- */
+function cvBuildSVG(){
+  const nodes = state.canvas.nodes;
+  if(!nodes.length) return null;
+  const idMap = {}; nodes.forEach(n=>idMap[n.id]=n);
+  let minX=1e9,minY=1e9,maxX=-1e9,maxY=-1e9;
+  nodes.forEach(n=>{
+    const s = cvNodeSize(n);
+    minX=Math.min(minX,n.x); minY=Math.min(minY,n.y);
+    maxX=Math.max(maxX,n.x+s.w); maxY=Math.max(maxY,n.y+s.h);
+  });
+  const pad = 40;
+  const W = Math.ceil(maxX-minX+pad*2), H = Math.ceil(maxY-minY+pad*2);
+  let body = '';
+  state.canvas.edges.forEach(e=>{
+    const a = idMap[e[0]], b = idMap[e[1]];
+    if(!a||!b) return;
+    body += `<path d="${cvPath(a,b)}" fill="none" stroke="#C9BEB6" stroke-width="1.8" marker-end="url(#arw)"/>`;
+  });
+  nodes.forEach(n=>{
+    const s = cvNodeSize(n);
+    const c = PALETTE[(n.color||0)%PALETTE.length];
+    const isRoot = n.type==='root';
+    const isLeaf = n.type==='leaf';
+    const lines = cvMetrics(n).lines;
+    body += `<g><rect x="${n.x}" y="${n.y}" width="${s.w}" height="${s.h}" rx="${isRoot?12:9}"
+      fill="${isRoot?c:(isLeaf?'#FFFFFF':c+'14')}" stroke="${c}" stroke-width="${isRoot?2:1.5}"/>`;
+    lines.forEach((l,i)=>{
+      body += `<text x="${n.x+15}" y="${n.y+21+i*19}" font-size="${i===0?12.5:11.5}" font-weight="${i===0&&(isRoot||!isLeaf)?650:500}"
+        fill="${isRoot ? (i===0?'#FFFFFF':'#F1EDEA') : (i===0?c:'#5A514A')}"
+        font-family="-apple-system,BlinkMacSystemFont,Segoe UI,PingFang SC,Microsoft YaHei,sans-serif">${esc(l)}</text>`;
+    });
+    body += '</g>';
+  });
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="${minX-pad} ${minY-pad} ${W} ${H}">
+<defs><marker id="arw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+<path d="M0 0 L10 5 L0 10 z" fill="#C9BEB6"/></marker></defs>
+<rect x="${minX-pad}" y="${minY-pad}" width="${W}" height="${H}" fill="#FAF8F6"/>
+${body}</svg>`;
+}
+
+function download(name, content, mime){
+  const blob = new Blob([content], {type:mime});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  document.body.appendChild(a); a.click();
+  setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 800);
+}
+
+function exportSVG(){
+  const svg = cvBuildSVG();
+  if(!svg) return toast('画布是空的，先生成一张图');
+  download('mindmap.svg', svg, 'image/svg+xml');
+  toast('SVG 已导出，可直接贴进 Markdown / 文档');
+}
+
+function exportPNG(){
+  const svg = cvBuildSVG();
+  if(!svg) return toast('画布是空的，先生成一张图');
+  const img = new Image();
+  const blob = new Blob([svg], {type:'image/svg+xml;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  img.onload = ()=>{
+    const cv = document.createElement('canvas');
+    const sc = 2;
+    cv.width = img.width*sc; cv.height = img.height*sc;
+    const ctx = cv.getContext('2d');
+    ctx.fillStyle = '#FAF8F6'; ctx.fillRect(0,0,cv.width,cv.height);
+    ctx.drawImage(img,0,0,cv.width,cv.height);
+    URL.revokeObjectURL(url);
+    cv.toBlob(b=>{
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(b);
+      a.download = 'mindmap.png';
+      document.body.appendChild(a); a.click();
+      setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 800);
+      toast('PNG 已导出（2 倍分辨率）');
+    });
+  };
+  img.onerror = ()=>{ toast('PNG 导出失败，请用 SVG 导出'); URL.revokeObjectURL(url); };
+  img.src = url;
+}
+
+/* =======================================================================
+   模块 5 · 投递冲刺（14 天补齐清单 · 产出驱动）
+   ======================================================================= */
+function renderSprint(){
+  const el = $('#views');
+  const list = state.sprint || [];
+  const doneN = list.filter(x=>x.done).length;
+  const total = list.length || 1;
+  const pct = Math.round(doneN/total*100);
+  const cur = list.find(x=>!x.done);
+  const curIdx = cur ? list.indexOf(cur) : -1;
+
+  let h = '<div class="view">';
+
+  /* 进度三指标 */
+  h += `<div class="stats">
+    <div class="stat"><div class="l">冲刺进度</div><div class="v">${doneN}<small>/ ${list.length}</small></div>
+      <div class="b"><i style="width:${pct}%"></i></div></div>
+    <div class="stat"><div class="l">已产出</div><div class="v">${doneN}<small> 件</small></div>
+      <div class="b"><i style="width:${pct}%"></i></div></div>
+    <div class="stat"><div class="l">剩余</div><div class="v">${list.length-doneN}<small> 天</small></div>
+      <div class="b"><i style="width:${100-pct}%"></i></div></div>
+    <div class="stat"><div class="l">预计收工</div><div class="v" style="font-size:16px;letter-spacing:0">${list.length?fmtMD(list[list.length-1].due):'—'}</div>
+      <div class="b"><i style="width:100%"></i></div></div>
+  </div>`;
+
+  /* 焦点：现在只需要做这一件 */
+  if(cur){
+    h += `<div class="focus">
+      <div class="focus-l">现在做这个 · ${esc(cur.day)}（第 ${curIdx+1} / ${list.length} 天）</div>
+      <div class="focus-t">${esc(cur.title)}</div>
+      <div class="focus-m">产出物：<b style="color:var(--acc)">${esc(cur.out)}</b> · 预计 ${esc(cur.hours)} · 截止 ${fmtMD(cur.due)}</div>
+      <div style="margin-top:13px;padding-top:12px;border-top:1px solid var(--line)">
+        <div style="font-size:10.5px;letter-spacing:.8px;color:var(--ink-3);font-weight:650;margin-bottom:6px">这一步做完的标准</div>
+        <ul style="margin:0;padding-left:17px;font-size:12.5px;color:var(--ink-2);line-height:1.8">
+          ${cur.items.map(it=>`<li>${esc(it)}</li>`).join('')}
+        </ul>
+        <div style="margin-top:10px;font-size:12px;color:var(--warn);background:var(--warn-bg);
+          border:1px solid var(--warn-bd);border-radius:var(--r-xs);padding:8px 10px;line-height:1.65">
+          <b>卡点预警：</b>${esc(cur.risk)}
+        </div>
+      </div>
+      <div class="focus-act">
+        <button class="btn" data-act="doneSprint" data-id="${cur.id}">标记完成</button>
+        <button class="btn ghost" data-act="go" data-view="res">去找对应资料</button>
+        <button class="btn ghost" data-act="go" data-view="jdmap">这条对应哪个 JD 要求</button>
+      </div>
+    </div>`;
+  }else{
+    h += `<div class="card" style="border-color:var(--ok-bd);background:var(--ok-bg)">
+      <div style="display:flex;align-items:center;gap:9px;font-size:13.5px;font-weight:620;color:var(--ok)">
+        <svg viewBox="0 0 24 24" style="width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M20 6 9 17l-5-5"/></svg>
+        14 天清单全部完成。资产包已就绪，接下来是投递与面试迭代。</div></div>`;
+  }
+
+  /* 清单全貌 */
+  h += `<div class="card"><div class="card-h"><h3>全部 14 天</h3><div class="sp"></div>
+    <span class="tag">点标题展开细节</span></div>`;
+  h += `<div style="font-size:12px;color:var(--ink-2);line-height:1.7;background:var(--acc-bg);
+    border:1px solid var(--acc-bd);border-radius:var(--r-xs);padding:9px 11px;margin-bottom:11px">
+    这是一份<b>产出自检清单</b>，不是学习清单——每天结束时，你手里应该多一件能拿给人看的东西。
+    落下的天数直接往后顺延，但<b>不要跳过任何一天的产出物</b>，它对应简历上的一句话。
+  </div>`;
+  list.forEach(x=>{
+    h += `<details class="acc">
+      <summary>
+        <span class="chip ${x.done?'ok':'grey'}" style="flex:0 0 auto">${esc(x.day)}</span>
+        <span style="${x.done?'text-decoration:line-through;color:var(--ink-3)':''}">${esc(x.out)}</span>
+        <span class="arw">›</span>
+      </summary>
+      <div class="acc-b">
+        <div style="font-size:12.5px;font-weight:600;margin-bottom:7px;color:var(--ink)">${esc(x.title)}</div>
+        <ul style="margin:0 0 9px;padding-left:17px;font-size:12.5px;color:var(--ink-2);line-height:1.8">
+          ${x.items.map(it=>`<li>${esc(it)}</li>`).join('')}
+        </ul>
+        <div style="font-size:11px;color:var(--ink-3);font-family:var(--mono);margin-bottom:8px">
+          ${fmtMD(x.due)} · 预计 ${esc(x.hours)}
+        </div>
+        <div style="font-size:12px;color:var(--warn);background:var(--warn-bg);border:1px solid var(--warn-bd);
+          border-radius:var(--r-xs);padding:8px 10px;line-height:1.65">
+          卡点预警：${esc(x.risk)}
+        </div>
+        <div style="margin-top:10px">
+          <button class="btn ${x.done?'ghost':''} sm" data-act="doneSprint" data-id="${x.id}">
+            ${x.done?'标记未完成':'标记完成'}</button>
+        </div>
+      </div>
+    </details>`;
+  });
+  h += '</div>';
+
+  h += '</div>';
+  el.innerHTML = h;
+}
+
+/* =======================================================================
+   模块 6 · JD 关键词映射（岗位要什么 ↔ 你有什么）
+   ======================================================================= */
+function renderJdmap(){
+  const el = $('#views');
+  const list = state.jdmap || [];
+  const N = list.length || 1;
+  const G = list.filter(j=>j.ready==='green');
+  const B = list.filter(j=>j.ready==='blue');
+  const R = list.filter(j=>j.ready==='red');
+
+  let h = '<div class="view">';
+
+  h += `<div class="stats">
+    <div class="stat"><div class="l">必须补出来</div><div class="v" style="color:var(--bad)">${R.length}<small> 项</small></div>
+      <div class="b"><i style="width:${R.length/N*100}%;background:var(--bad)"></i></div></div>
+    <div class="stat"><div class="l">需打磨到能讲</div><div class="v" style="color:var(--info)">${B.length}<small> 项</small></div>
+      <div class="b"><i style="width:${B.length/N*100}%;background:var(--info)"></i></div></div>
+    <div class="stat"><div class="l">已有真弹药</div><div class="v" style="color:var(--ok)">${G.length}<small> 项</small></div>
+      <div class="b"><i style="width:${G.length/N*100}%;background:var(--ok)"></i></div></div>
+    <div class="stat"><div class="l">覆盖率</div><div class="v">${Math.round((G.length+B.length)/N*100)}<small>%</small></div>
+      <div class="b"><i style="width:${(G.length+B.length)/N*100}%"></i></div></div>
+  </div>`;
+
+  h += `<div class="card">
+    <div class="card-h"><h3>使用方式</h3><div class="sp"></div><span class="tag">点击状态标签可切换</span></div>
+    <div style="font-size:12.5px;color:var(--ink-2);line-height:1.8">
+      <div style="margin-bottom:5px"><span class="chip p0">必须补</span> JD 里的硬门槛，没有就只能被筛掉——对应 21 天计划的 S1–S4。</div>
+      <div style="margin-bottom:5px"><span class="chip p2">需打磨</span> 有基础但要练到能讲清细节，否则面试会被追问穿。</div>
+      <div><span class="chip ok">真弹药</span> 你已经真做过的事，<b>这才是简历的骨架</b>——先把这些讲透，再补缺口。</div>
+    </div></div>`;
+
+  const groups = [
+    ['必须补出来', R, 'var(--bad)', 'var(--bad-bg)', 'var(--bad-bd)', '投递前必须真做出来的硬缺口，按顺序补：FastAPI → Docker → RAG → LangGraph → Agent。'],
+    ['需打磨到能脱口而出', B, 'var(--info)', 'var(--info-bg)', 'var(--info-bd)', '有基础但不扎实，重点是把「为什么这么做」讲清楚。'],
+    ['已有真弹药 · 直接讲', G, 'var(--ok)', 'var(--ok-bg)', 'var(--ok-bd)', '这些是真实的项目经历，是你简历的主体，务必逐条练成 30 秒口述。']
+  ];
+
+  groups.forEach(g=>{
+    const [name, arr, col, bg, bd, desc] = g;
+    if(!arr.length) return;
+    h += `<div class="card">
+      <div class="card-h">
+        <span style="width:7px;height:7px;border-radius:50%;background:${col};flex:0 0 7px"></span>
+        <h3>${name}</h3><div class="sp"></div>
+        <span class="tag">${arr.length} 项</span>
+      </div>
+      <div style="font-size:12px;color:var(--ink-2);line-height:1.7;background:${bg};
+        border:1px solid ${bd};border-radius:var(--r-xs);padding:8px 11px;margin-bottom:11px">${desc}</div>
+      <table class="tbl">
+        <thead><tr><th style="width:22%">JD 关键词</th><th style="width:9%">频率</th><th style="width:28%">你手里的弹药</th><th>补法与面试注意</th></tr></thead>
+        <tbody>
+        ${arr.map(j=>`<tr>
+          <td data-l="JD 关键词"><b style="font-size:12.5px">${esc(j.kw)}</b><div style="margin-top:4px">
+            <button class="chip ${j.ready==='green'?'ok':j.ready==='blue'?'p2':'p0'}" data-act="cycleJd" data-id="${j.id}"
+              style="cursor:pointer">${j.ready==='green'?'真弹药':j.ready==='blue'?'需打磨':'必须补'}</button></div></td>
+          <td data-l="频率"><span style="font-family:var(--mono);font-size:11px;color:var(--ink-3)">${esc(j.freq)}</span></td>
+          <td data-l="你的弹药" style="color:var(--ink-2)">${esc(j.resume)}</td>
+          <td data-l="补法与面试注意" style="color:var(--ink-2)">${esc(j.note)}</td>
+        </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`;
+  });
+
+  h += `<div class="card" style="background:var(--bad-bg);border-color:var(--bad-bd)">
+    <div class="card-h"><h3 style="color:var(--bad)">一句话原则</h3></div>
+    <div style="font-size:12.5px;color:var(--ink-2);line-height:1.8">
+      上面 <b>${G.length} 项「真弹药」</b>是你真正的底牌——它们全部来自你真实做过的事，任何追问都答得上。
+      简历应该以它们为主体，而不是堆砌还没做过的技术名词。技术面试官一句「这个分块参数你怎么定的」就能拆穿包装，
+      所以：<b>宁可少写一项，不要写一项讲不清的。</b>
+    </div></div>`;
+
+  h += '</div>';
+  el.innerHTML = h;
+}
+
+/* =======================================================================
+   模块 7 · 认知配置（ADHD × INTP 执行协议）
+   ======================================================================= */
+function renderProfile(){
+  const el = $('#views');
+  let h = '<div class="view">';
+
+  h += `<div class="focus">
+    <div class="focus-l">这份工作台是按你的认知特点设计的</div>
+    <div class="focus-t">不是靠自律，是靠结构</div>
+    <div class="focus-m">如果你只记住一句话：<b>每天只认领一个产出物，做完就算赢。</b>
+      剩下的交给看板和清单，别在脑子里同时装 14 件事。</div>
+  </div>`;
+
+  /* 认知协议 */
+  h += `<div class="card"><div class="card-h"><h3>你的执行协议</h3><div class="sp"></div>
+    <span class="tag">ADHD × INTP 取向</span></div>`;
+  COGNITION.forEach(c=>{
+    h += `<div style="padding:10px 0;border-bottom:1px solid var(--line-2)">
+      <div style="font-size:13px;font-weight:620;letter-spacing:-.1px;margin-bottom:4px">${esc(c.t)}</div>
+      <div style="font-size:12.5px;color:var(--ink-2);line-height:1.75">${esc(c.k)}</div>
+    </div>`;
+  });
+  h += '</div>';
+
+  /* 目标定位 */
+  h += `<div class="card"><div class="card-h"><h3>目标定位</h3></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:11px">
+      <span class="chip acc">AI 应用落地工程师</span><span class="chip p1">RAG 知识库开发</span>
+      <span class="chip p2">Python 后端（保底）</span><span class="chip grey">杭州 · 8–11K</span>
+    </div>
+    <div style="font-size:13px;color:var(--ink-2);line-height:1.78">
+      你的真实竞争力不在"会不会写代码"，而在<b>「业务一线 + 零成本全栈交付」</b>这个组合：
+      懂业务一线的真实流程痛点，又能独立把需求做到公网可用。这在纯技术背景的候选人里是稀缺的。
+      21 天计划全部围绕一件事——<b>把已有的 6 个真实项目，翻译成面试官能听懂的"技术语言"</b>，并补上 4 个硬缺口。
+    </div></div>`;
+
+  /* 六维适配 */
+  const dims = [
+    ['零成本全栈交付', 88, '3 个内部系统已上线，从需求到部署全链路独立完成', 'var(--ok)'],
+    ['业务需求翻译', 85, '2.5 年行政/人资一线，能精准把痛点转成技术方案', 'var(--ok)'],
+    ['AI 工具驾驭', 82, '主流 AI 编程工具熟练，10 天交付企业级 MVP', 'var(--info)'],
+    ['数据治理实战', 78, '数十万条非结构化数据 → 数万条结构化条目，含溯源与置信度', 'var(--info)'],
+    ['工程化规范', 52, '缺 FastAPI/Docker/测试/CI——S1 阶段主攻方向', 'var(--warn)'],
+    ['RAG/Agent 体系', 45, '概念清楚但缺完整落地链路——S2/S3 阶段专攻', 'var(--warn)']
+  ];
+  h += `<div class="card"><div class="card-h"><h3>六维适配度</h3><div class="sp"></div>
+    <span class="tag">自评基线</span></div>`;
+  dims.forEach(d=>{
+    h += `<div style="margin-bottom:12px">
+      <div style="display:flex;font-size:12.5px;margin-bottom:4px">
+        <b style="font-weight:600">${d[0]}</b>
+        <span style="margin-left:auto;color:${d[3]};font-weight:650;font-family:var(--mono)">${d[1]}</span></div>
+      <div class="bar"><i style="width:${d[1]}%;background:${d[3]}"></i></div>
+      <div style="font-size:11.5px;color:var(--ink-3);margin-top:4px;line-height:1.6">${d[2]}</div></div>`;
+  });
+  h += '</div>';
+
+  /* 项目资产 */
+  const assets = [
+    ['企业员工职业性格测评系统','120 题 / 4 套体系 / 静态托管 + 托管数据库 / 企业内已上线','P0'],
+    ['企业考勤数据治理流水线','企业协作平台开放 API + 规则引擎 + 宽表输出，封装为可复用组件','P0'],
+    ['公文 docx 格式标准化引擎','Python 3.10 + OOXML 样式树，覆盖 13+ 套公司模板','P0'],
+    ['多源数据交叉分析系统','5 类数据体系 + 历法换算算法 + 多源交叉验证','P1'],
+    ['个人数据治理知识库','JSON Schema 管道 + 数万条结构化条目 + 溯源与置信度分级','P1'],
+    ['企业内刊排版设计','单期 · 杂志风 · 图文混排 · PDF 交付','P2']
+  ];
+  h += `<div class="card"><div class="card-h"><h3>真实项目资产（简历弹药）</h3>
+    <div class="sp"></div><span class="tag">${assets.length} 个</span></div>`;
+  assets.forEach(a=>{
+    h += `<div style="display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--line-2)">
+      <span class="chip ${a[2]==='P0'?'p0':a[2]==='P1'?'p1':'p2'}" style="margin-top:2px">${a[2]}</span>
+      <div><div style="font-size:13px;font-weight:600">${a[0]}</div>
+      <div style="font-size:12px;color:var(--ink-3);margin-top:2px;line-height:1.6">${a[1]}</div></div></div>`;
+  });
+  h += `<div style="margin-top:11px;font-size:12px;color:var(--ink-2);background:var(--warn-bg);
+    border:1px solid var(--warn-bd);border-radius:var(--r-xs);padding:10px 12px;line-height:1.72">
+    <b style="color:var(--warn)">投递前必做：</b>以上项目写进简历时，<b>量化数字必须自己核实一遍</b>（员工数、记录条数、模板套数、外部报价）。
+    这一版工作台只保证「表述结构可讲」，不替代你的事实核对。</div></div>`;
+
+  /* 策略 */
+  h += `<div class="card"><div class="card-h"><h3>个性化策略</h3></div>
+    <div style="font-size:13px;color:var(--ink-2);line-height:1.85">
+      <div style="margin-bottom:10px"><b style="color:var(--acc)">1. 主打"业务+技术复合"而非"纯技术"。</b>
+      工业工程本科背景（运筹 / 系统工程 / 成本分析）＋ 2.5 年业务一线经验，是天然的产品视角。把每个项目讲成"我发现了一个流程痛点 → 我用技术解决了它 → 省了多少钱/多少时间"。</div>
+      <div style="margin-bottom:10px"><b style="color:var(--acc)">2. 用"成本意识"做差异化。</b>
+      你的项目几乎都是零成本或极低成本交付（Cloudflare Pages 免费、Supabase 免费层、Railway 试用）。中小企业最怕技术人烧钱，这是杀手锏。</div>
+      <div style="margin-bottom:10px"><b style="color:var(--acc)">3. 只补 4 个硬缺口，不要贪多。</b>
+      FastAPI → Docker → RAG 链路 → Agent。每补一个就立刻包进作品集，别等"学完再整理"。</div>
+      <div style="margin-bottom:10px"><b style="color:var(--acc)">4. 优先投"AI 应用落地"而非"算法岗"。</b>
+      算法岗需要论文/竞赛背景，你的路子在"把模型用起来"——RAG 知识库、企业 Agent、流程自动化，这些岗位更看重交付能力。</div>
+      <div><b style="color:var(--acc)">5. 时间线要卡住。</b>
+      合同到期前完成资产包，即启动定向投递，用真实面试反馈修正，不要无限期准备。</div>
+    </div></div>`;
+
+  h += `<div class="card" style="background:var(--bad-bg);border-color:var(--bad-bd)">
+    <div class="card-h"><h3 style="color:var(--bad)">风险提醒</h3></div>
+    <div style="font-size:12.5px;color:var(--ink-2);line-height:1.8">
+      转行简历最大的风险是<b>「写了但答不上」</b>。技术面试官一句"这个 RAG 的分块参数你怎么定的"就能拆穿包装。
+      所以本工作台的资料全部按「能讲清实现细节」的标准挑选，S2/S3 阶段每个目标都要求有可演示产出。
+      <b>宁可少写一条，不要写一条讲不清的。</b>
+    </div></div>`;
+
+  h += '</div>';
+  el.innerHTML = h;
+}
+
+/* =======================================================================
+   统一刷新入口（唯一调度点）
+   ======================================================================= */
+function refreshAll(){
+  renderNav();
+  renderTop();
+  const R = {
+    today: renderToday, kanban: renderKanban, sprint: renderSprint, plan: renderPlan,
+    res: renderRes, jdmap: renderJdmap, canvas: renderCanvas, profile: renderProfile
+  };
+  (R[VIEW] || renderToday)();
+}
+
+/* =======================================================================
+   事件处理（只改数据 + 调 refreshAll，禁止在渲染函数内互调）
+   ======================================================================= */
+function go(v){ VIEW = v; refreshAll(); window.scrollTo({top:0,behavior:'smooth'}); }
+function toast(msg){
+  const t = $('#toast'); if(!t) return;
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(t._h); t._h = setTimeout(()=>t.classList.remove('show'), 1900);
+}
+function moveTarget(id, col){
+  const g = state.targets.find(x=>x.id===id);
+  if(!g || g.status===col) return;
+  g.status = col;
+  saveData(); refreshAll();
+}
+function toggleTarget(id){
+  const g = state.targets.find(x=>x.id===id);
+  if(!g) return;
+  g.status = g.status==='done' ? 'todo' : 'done';
+  saveData(); refreshAll();
+}
+function doneTask(id){
+  const k = state.tasks.find(x=>x.id===id);
+  if(!k) return;
+  k.status = 'done'; saveData(); refreshAll();
+  toast('已完成一条');
+}
+function delTask(id){
+  state.tasks = state.tasks.filter(x=>x.id!==id);
+  saveData(); refreshAll();
+}
+function clearDoneTasks(){
+  state.tasks = state.tasks.filter(x=>x.status!=='done');
+  saveData(); refreshAll(); toast('已清除');
+}
+/* ---------- 冲刺 / JD 映射 / 主题 ---------- */
+function toggleSprint(id){
+  const x = (state.sprint||[]).find(i=>i.id===id);
+  if(!x) return;
+  x.done = !x.done;
+  saveData(); refreshAll();
+  toast(x.done ? ('已完成 '+x.day+'：'+x.out) : ('已恢复 '+x.day));
+}
+function resetSprint(){
+  if(!confirm('把所有 14 天冲刺项重置为未完成？已产出的文件不会消失，只是清单进度归零。')) return;
+  (state.sprint||[]).forEach(x=>{ x.done = false; });
+  saveData(); refreshAll(); toast('冲刺清单已重置');
+}
+function cycleJd(id){
+  const j = (state.jdmap||[]).find(x=>x.id===id);
+  if(!j) return;
+  const seq = ['green','blue','red'];
+  j.ready = seq[(seq.indexOf(j.ready)+1) % seq.length];
+  saveData(); refreshAll();
+}
+function setTheme(mode){
+  document.body.setAttribute('data-theme', mode);
+  const txt = document.getElementById('themeTxt');
+  if(txt) txt.textContent = mode==='dark' ? '暗色模式' : '亮色模式';
+  try{ localStorage.setItem(LS_KEY+'_theme', mode); }catch(e){}
+}
+function addTask(){
+  const t = prompt('新待办内容：');
+  if(!t || !t.trim()) return;
+  state.tasks.push({id:uid('k'), title:t.trim(), pri:'P1', status:'todo', due:todayStr(), src:'临时添加'});
+  saveData(); refreshAll(); toast('已添加');
+}
+function addTarget(){
+  const t = prompt('新目标内容（要求：可验收的产出物）：');
+  if(!t || !t.trim()) return;
+  const stage = prompt('属于哪个阶段？\n'+STAGES.map(s=>s.key).join(' / '), 'S1 筑基');
+  const pri = prompt('优先级？（P0 / P1 / P2）','P1');
+  state.targets.push({
+    id:uid('g'), title:t.trim(), stage:(STAGES.find(s=>s.key===stage)?stage:'S1 筑基'),
+    pri:(['P0','P1','P2'].includes(pri)?pri:'P1'), status:'todo',
+    due:dateAdd(todayStr(),7), res:''
+  });
+  saveData(); refreshAll(); toast('已新建目标');
+}
+function toggleRes(id){
+  const r = state.resources.find(x=>x.id===id);
+  if(!r) return;
+  r.done = !r.done; saveData(); refreshAll();
+}
+function addNode(){
+  const t = prompt('节点文字（换行用 \\n）：','新节点');
+  if(t===null) return;
+  state.canvas.nodes.push({id:uid('n'), x:120, y:120, w:214, text:t.replace(/\\n/g,'\n'), type:'branch', color:state.canvas.nodes.length%5});
+  saveData(); cvPaint(); toast('已添加节点');
+}
+
+/* 事件委托（一次绑定，全局生效） */
+document.addEventListener('click', e=>{
+  const btn = e.target.closest('[data-act]');
+  if(btn){ onAction(btn.dataset.act, btn, e); return; }
+  const nv = e.target.closest('nav [data-view]');
+  if(nv) go(nv.dataset.view);
+});
+
+function onAction(act, btn, e){
+  const id = btn.dataset.id;
+  switch(act){
+    case 'addTask': addTask(); break;
+    case 'addTarget': addTarget(); break;
+    case 'doneTask': doneTask(id); break;
+    case 'delTask': delTask(id); break;
+    case 'clearDoneTasks': clearDoneTasks(); break;
+    case 'doneSprint': toggleSprint(id); break;
+    case 'resetSprint': resetSprint(); break;
+    case 'cycleJd': cycleJd(id); break;
+    case 'doneTarget': toggleTarget(id); break;
+    case 'doneRes': toggleRes(id); break;
+    case 'go': go(btn.dataset.view); break;
+    case 'filterRes': RES_FILTER = btn.dataset.k; renderRes(); renderTop(); break;
+    case 'toggleAllRes': {
+      const allDone = state.resources.every(r=>r.done);
+      state.resources.forEach(r=>r.done = !allDone);
+      saveData(); refreshAll(); toast(allDone?'已全部展开':'已全部标记完成');
+      break;
+    }
+    case 'addNode': addNode(); break;
+    case 'layout': layoutFit(); toast('已适应窗口'); break;
+    case 'fit': layoutFit(); break;
+    case 'zin': CV.scale = Math.min(2.4, CV.scale*1.18); cvPaint(); break;
+    case 'zout': CV.scale = Math.max(0.3, CV.scale*0.85); cvPaint(); break;
+    case 'zreset': CV.scale = 1; cvPaint(); break;
+    case 'connectMode': {
+      const w = document.getElementById('cvWrap');
+      if(w){ w.dataset.connect = w.dataset.connect==='1' ? '0' : '1'; }
+      toast(w && w.dataset.connect==='1' ? '连线模式：依次点两个节点' : '已退出连线模式');
+      break;
+    }
+    case 'genStage': genStageMap(btn.dataset.k); break;
+    case 'genFlow': genFlow(); break;
+    case 'genFromPlan': genFromPlan(); break;
+    case 'genMap': genFromPlan(); break;
+    case 'exportSVG': exportSVG(); break;
+    case 'exportPNG': exportPNG(); break;
+    case 'clearCanvas': {
+      if(!confirm('确定清空画布上的所有节点与连线？此操作不可撤销。')) return;
+      state.canvas.nodes = []; state.canvas.edges = [];
+      saveData(); cvPaint(); toast('画布已清空');
+      break;
+    }
+  }
+}
+
+/* 备份 / 恢复 */
+function exportJSON(){
+  const payload = {app:'career-ops-workspace', exportedAt:new Date().toISOString(), data:state};
+  download('AI转型作战台-备份-'+todayStr()+'.json', JSON.stringify(payload,null,2), 'application/json');
+  toast('已导出备份文件');
+}
+function importJSON(file){
+  const fr = new FileReader();
+  fr.onload = ()=>{
+    try{
+      const p = JSON.parse(fr.result);
+      const d = p.data || p;
+      if(!d || typeof d !== 'object') throw new Error('格式错误');
+      if(!confirm('导入将覆盖当前数据（'+(state.targets.length+state.tasks.length+state.resources.length)+' 条记录）。继续？')) return;
+      state = Object.assign(JSON.parse(JSON.stringify(DEFAULT_DATA)), d);
+      if(!state.canvas || !state.canvas.nodes) state.canvas = {nodes:[],edges:[],view:{x:0,y:0,z:1}};
+      saveData(); refreshAll(); toast('导入成功，共恢复 '+(state.targets.length+state.tasks.length+state.resources.length)+' 条记录');
+    }catch(err){ alert('导入失败：文件格式不正确（'+err.message+'）'); }
+  };
+  fr.readAsText(file);
+}
+
+/* =======================================================================
+   启动（防御性初始化：加载数据 → 定状态 → 一次性 refreshAll）
+   ======================================================================= */
+function boot(){
+  loadData();
+  if(!state.targets.length && !state.skipExample){ /* 保留空态，不强制重置 */ }
+
+  /* 主题：默认暗色（ADHD / INTP 取向），用户选择持久化 */
+  let th = 'dark';
+  try{ th = localStorage.getItem(LS_KEY+'_theme') || 'dark'; }catch(e){}
+  setTheme(th);
+
+  VIEW = 'today';
+  refreshAll();
+
+  const bth = $('#btnTheme');
+  if(bth) bth.addEventListener('click', ()=>{
+    setTheme(document.body.getAttribute('data-theme')==='dark' ? 'light' : 'dark');
+  });
+
+  $('#btnExport').addEventListener('click', exportJSON);
+  $('#btnImport').addEventListener('click', ()=>$('#fileImport').click());
+  $('#fileImport').addEventListener('change', ev=>{
+    const f = ev.target.files && ev.target.files[0];
+    if(f) importJSON(f);
+    ev.target.value = '';
+  });
+
+  // 窗口尺寸变化：画布自适应重绘（不在渲染链内互调）
+  let rz = null;
+  window.addEventListener('resize', ()=>{
+    clearTimeout(rz);
+    rz = setTimeout(()=>{ if(VIEW==='canvas') cvPaint(); }, 180);
+  });
+}
+
+if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+else boot();
+</script>
+</body>
+</html>
+

@@ -1,0 +1,327 @@
+{
+  "schema_version": 1,
+  "diagram_type": "sequence",
+  "meta": {
+    "title": "启动与一次交互的调用时序",
+    "subtitle": "从打开页面到完成一次冲刺项勾选并自动落盘",
+    "locale": "zh-CN",
+    "output": "docs/diagrams/sequence.html",
+    "viewBox": [
+      1040,
+      740
+    ],
+    "column_fit": "spread",
+    "animation": "trace",
+    "quality_profile": "showcase",
+    "views": [
+      {
+        "id": "boot",
+        "label": "启动阶段",
+        "focus": [
+          "user",
+          "shell",
+          "data",
+          "store",
+          "view"
+        ],
+        "note": "读本地数据，缺失则注入种子，随后一次性渲染首屏。"
+      },
+      {
+        "id": "interact",
+        "label": "交互阶段",
+        "focus": [
+          "user",
+          "shell",
+          "data",
+          "store"
+        ],
+        "note": "一次勾选只做两件事：改 state，然后落盘。"
+      },
+      {
+        "id": "repaint",
+        "label": "重绘阶段",
+        "focus": [
+          "shell",
+          "view",
+          "canvas",
+          "user"
+        ],
+        "note": "统一刷新入口重绘所有模块，画布视图额外走一次 SVG 重绘。"
+      }
+    ]
+  },
+  "participants": [
+    {
+      "id": "user",
+      "type": "external",
+      "label": "用户",
+      "sublabel": "PC / 手机"
+    },
+    {
+      "id": "shell",
+      "type": "frontend",
+      "label": "单文件应用",
+      "sublabel": "index.html"
+    },
+    {
+      "id": "data",
+      "type": "backend",
+      "label": "数据层",
+      "sublabel": "load / save"
+    },
+    {
+      "id": "calc",
+      "type": "backend",
+      "label": "计算层",
+      "sublabel": "逾期 / 焦点"
+    },
+    {
+      "id": "view",
+      "type": "frontend",
+      "label": "渲染层",
+      "sublabel": "8 个 render*"
+    },
+    {
+      "id": "canvas",
+      "type": "frontend",
+      "label": "画布引擎",
+      "sublabel": "cv* 系列"
+    },
+    {
+      "id": "store",
+      "type": "database",
+      "label": "localStorage",
+      "sublabel": "career_ops_v1"
+    }
+  ],
+  "segments": [
+    {
+      "from": 150,
+      "to": 424,
+      "label": "启动阶段"
+    },
+    {
+      "from": 434,
+      "to": 540,
+      "label": "交互阶段"
+    },
+    {
+      "from": 548,
+      "to": 662,
+      "label": "重绘阶段"
+    }
+  ],
+  "messages": [
+    {
+      "id": "open",
+      "from": "user",
+      "to": "shell",
+      "y": 162,
+      "label": "打开链接 / 双击文件",
+      "variant": "default"
+    },
+    {
+      "id": "load",
+      "from": "shell",
+      "to": "data",
+      "y": 191,
+      "label": "loadData()",
+      "variant": "emphasis"
+    },
+    {
+      "id": "getitem",
+      "from": "data",
+      "to": "store",
+      "y": 220,
+      "label": "getItem(career_ops_v1)",
+      "variant": "default"
+    },
+    {
+      "id": "raw",
+      "from": "store",
+      "to": "data",
+      "y": 249,
+      "label": "JSON 或 null",
+      "variant": "return"
+    },
+    {
+      "id": "ready",
+      "from": "data",
+      "to": "shell",
+      "y": 278,
+      "label": "state 就绪 / 首次注入种子数据",
+      "variant": "return"
+    },
+    {
+      "id": "refresh1",
+      "from": "shell",
+      "to": "view",
+      "y": 307,
+      "label": "refreshAll()",
+      "variant": "emphasis"
+    },
+    {
+      "id": "alerts",
+      "from": "view",
+      "to": "calc",
+      "y": 336,
+      "label": "collectAlerts() / pickFocus()",
+      "variant": "default"
+    },
+    {
+      "id": "focus",
+      "from": "calc",
+      "to": "view",
+      "y": 365,
+      "label": "逾期项 + 唯一焦点",
+      "variant": "return"
+    },
+    {
+      "id": "firstpaint",
+      "from": "view",
+      "to": "shell",
+      "y": 394,
+      "label": "首屏模块渲染完成",
+      "variant": "return"
+    },
+    {
+      "id": "show",
+      "from": "shell",
+      "to": "user",
+      "y": 423,
+      "label": "显示「今日要处理」",
+      "variant": "return"
+    },
+    {
+      "id": "act",
+      "from": "user",
+      "to": "shell",
+      "y": 452,
+      "label": "勾选冲刺项 / 拖拽卡片",
+      "variant": "emphasis"
+    },
+    {
+      "id": "save",
+      "from": "shell",
+      "to": "data",
+      "y": 481,
+      "label": "saveData()",
+      "variant": "emphasis"
+    },
+    {
+      "id": "setitem",
+      "from": "data",
+      "to": "store",
+      "y": 510,
+      "label": "setItem(JSON)",
+      "variant": "default"
+    },
+    {
+      "id": "sync",
+      "from": "data",
+      "to": "shell",
+      "y": 539,
+      "label": "写入成功 · 已保存",
+      "variant": "return"
+    },
+    {
+      "id": "refresh2",
+      "from": "shell",
+      "to": "view",
+      "y": 568,
+      "label": "refreshAll()",
+      "variant": "emphasis"
+    },
+    {
+      "id": "paint",
+      "from": "view",
+      "to": "canvas",
+      "y": 597,
+      "label": "cvPaint()（画布视图时）",
+      "variant": "default"
+    },
+    {
+      "id": "redraw",
+      "from": "canvas",
+      "to": "view",
+      "y": 626,
+      "label": "SVG 重绘 + 计数同步",
+      "variant": "return"
+    },
+    {
+      "id": "done",
+      "from": "view",
+      "to": "user",
+      "y": 655,
+      "label": "视图更新完成",
+      "variant": "return"
+    }
+  ],
+  "activations": [
+    {
+      "participant": "shell",
+      "from": 178,
+      "to": 660,
+      "type": "frontend"
+    },
+    {
+      "participant": "data",
+      "from": 188,
+      "to": 646,
+      "type": "backend"
+    },
+    {
+      "participant": "store",
+      "from": 214,
+      "to": 516,
+      "type": "database"
+    },
+    {
+      "participant": "view",
+      "from": 302,
+      "to": 660,
+      "type": "frontend"
+    },
+    {
+      "participant": "calc",
+      "from": 330,
+      "to": 371,
+      "type": "backend"
+    },
+    {
+      "participant": "canvas",
+      "from": 591,
+      "to": 632,
+      "type": "frontend"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "启动只有一条链",
+      "items": [
+        "loadData 读本地，缺失则注入种子数据后立即落盘",
+        "拿到 state 后只调一次 refreshAll()",
+        "渲染函数各自读 state，彼此不调用"
+      ]
+    },
+    {
+      "dot": "cyan",
+      "title": "交互只做两件事",
+      "items": [
+        "事件委托解析 data-act，改对应 state 字段",
+        "saveData() 序列化并给出同步状态反馈",
+        "不直接操作 DOM，改完统一刷新"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "重绘路径可控",
+      "items": [
+        "画布视图额外触发一次 SVG 重绘与计数同步",
+        "非画布视图跳过该分支，无多余开销",
+        "返回消息弱于请求消息，主路径始终清晰"
+      ]
+    }
+  ]
+}

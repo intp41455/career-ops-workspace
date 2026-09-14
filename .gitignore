@@ -1,0 +1,46 @@
+# ---- 操作系统 / 编辑器 ----
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
+*.code-workspace
+
+# ---- 依赖 / 构建（本项目不需要，留作防止误提交）----
+node_modules/
+dist/
+build/
+.cache/
+*.log
+npm-debug.log*
+yarn-error.log*
+
+# ---- 本地预览 / 临时文件 ----
+_s_*.html
+_smoke.js
+_check*.js
+_probe*.html
+*_bak.html
+s_*.png
+v_*.png
+shot_*.png
+docs/diagrams/_preview/_raw_*.png
+
+# ---- 隐私：真实个人数据不要进仓库 ----
+# 「导出备份」产生的 JSON 含真实姓名 / 薪资 / 公司内部信息，务必不要提交
+AI转型作战台-备份-*.json
+career-ops-backup-*.json
+*.backup.json
+private/
+secrets/
+.env
+.env.*
+
+# ---- Python（若你用它跑本地静态服务）----
+__pycache__/
+*.py[cod]
+venv/
+.venv/

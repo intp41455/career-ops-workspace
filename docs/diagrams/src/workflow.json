@@ -1,0 +1,54 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "工作台使用流程：从打开到导出资产",
+    "subtitle": "每天一轮：认领一件事 → 落盘 → 沉淀成可展示的资产",
+    "locale": "zh-CN",
+    "output": "docs/diagrams/workflow.html",
+    "quality_profile": "showcase",
+    "viewBox": [1200, 570],
+    "views": [
+      { "id": "boot", "label": "打开即就绪", "focus": ["n1", "n2", "n3"], "note": "读本地数据渲染首屏，并算出今天唯一该做的那件事。" },
+      { "id": "daily", "label": "每日一轮", "focus": ["n4", "n5", "n6"], "note": "认领一件事、标记完成，变更自动落盘并给出状态反馈。" },
+      { "id": "asset", "label": "沉淀资产", "focus": ["n7", "n8", "n9"], "note": "把计划一键转成思维导图，再导出 SVG / PNG 用作作品集素材。" }
+    ]
+  },
+  "lanes": [
+    { "id": "user", "label": "用户" },
+    { "id": "ui", "label": "工作台界面" },
+    { "id": "data", "label": "数据与存储" }
+  ],
+  "phases": [
+    { "id": "ph-open", "label": "打开", "fromCol": 0, "toCol": 1 },
+    { "id": "ph-daily", "label": "每日一轮", "fromCol": 2, "toCol": 3 },
+    { "id": "ph-asset", "label": "沉淀资产", "fromCol": 4, "toCol": 5 }
+  ],
+  "nodes": [
+    { "id": "n1", "lane": "user", "col": 0, "type": "external", "label": "打开工作台", "sublabel": "链接 / 本地文件", "tag": "零安装", "width": 150 },
+    { "id": "n2", "lane": "ui", "col": 1, "type": "frontend", "label": "渲染首屏与唯一焦点", "sublabel": "refreshAll()", "tag": "8 个模块", "width": 150 },
+    { "id": "n3", "lane": "data", "col": 1, "type": "database", "label": "读取本地数据", "sublabel": "loadData()", "tag": "缺失即注入种子", "width": 150 },
+    { "id": "n4", "lane": "user", "col": 2, "type": "external", "label": "认领今日一件事", "sublabel": "只认领一个产出物", "tag": "降决策成本", "width": 150 },
+    { "id": "n5", "lane": "ui", "col": 3, "type": "backend", "label": "标记完成 / 拖拽流转", "sublabel": "onAction → 改 state", "tag": "单一写点", "width": 150 },
+    { "id": "n6", "lane": "data", "col": 3, "type": "database", "label": "自动落盘 + 状态提示", "sublabel": "saveData()", "tag": "刷新不丢", "width": 150 },
+    { "id": "n7", "lane": "ui", "col": 4, "type": "frontend", "label": "一键生成思维导图", "sublabel": "genFromPlan()", "tag": "计划即图", "width": 150 },
+    { "id": "n8", "lane": "data", "col": 4, "type": "database", "label": "自动分层布局", "sublabel": "layoutAuto()", "tag": "零重叠", "width": 150 },
+    { "id": "n9", "lane": "ui", "col": 5, "type": "frontend", "label": "导出 SVG / PNG", "sublabel": "cvBuildSVG()", "tag": "作品集素材", "width": 150 }
+  ],
+  "mainPath": ["n1", "n2", "n4", "n5", "n7", "n9"],
+  "edges": [
+    { "id": "e1", "from": "n1", "to": "n2", "label": "进入", "role": "main", "variant": "emphasis" },
+    { "id": "e2", "from": "n3", "to": "n2", "label": "state 就绪", "role": "return", "variant": "dashed" },
+    { "id": "e3", "from": "n2", "to": "n4", "label": "显示待处理", "role": "main", "variant": "emphasis" },
+    { "id": "e4", "from": "n4", "to": "n5", "label": "认领 / 操作", "role": "main", "variant": "emphasis" },
+    { "id": "e5", "from": "n5", "to": "n6", "label": "变更后触发", "role": "async", "variant": "dashed" },
+    { "id": "e6", "from": "n5", "to": "n7", "label": "本轮完成", "role": "main", "variant": "emphasis" },
+    { "id": "e7", "from": "n7", "to": "n8", "label": "布局求解", "role": "async", "variant": "dashed" },
+    { "id": "e8", "from": "n7", "to": "n9", "label": "生成完成", "role": "main", "variant": "emphasis" }
+  ],
+  "cards": [
+    { "dot": "cyan", "title": "每日一轮的节奏", "items": ["首屏只给一个焦点动作，减少决策点", "完成即落盘，刷新与关窗都不丢", "完成感即时可见，靠反馈而不是靠自律"] },
+    { "dot": "emerald", "title": "计划直接变资产", "items": ["21 天计划可一键转为网状思维导图", "自动分层布局保证节点零重叠、文本不截断", "导出 SVG / PNG 直接进作品集与文档"] },
+    { "dot": "amber", "title": "可移植与可备份", "items": ["数据存在浏览器本地，不上传服务器", "导出 / 导入 JSON 完成跨设备迁移", "清空数据需二次确认，避免误删"] }
+  ]
+}

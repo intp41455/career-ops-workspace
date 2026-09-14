@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "单文件工作台运行时架构",
+    "subtitle": "无后端 · 无构建 · 零外部依赖的分层调用结构",
+    "locale": "zh-CN",
+    "output": "docs/diagrams/architecture.html",
+    "quality_profile": "showcase",
+    "viewBox": [1120, 560],
+    "views": [
+      { "id": "layers", "label": "分层与唯一读写点", "focus": ["data", "seed", "store"], "note": "数据层是全局唯一读写点，种子数据只在首次打开与版本迁移时注入。" },
+      { "id": "render-path", "label": "调度到渲染", "focus": ["data", "schedule", "render", "canvas"], "note": "refreshAll() 是唯一刷新入口，渲染层只读 state、只写 DOM。" },
+      { "id": "portability", "label": "可移植性", "focus": ["users", "host", "backup"], "note": "文件可直开也可静态托管；JSON 备份承担跨设备迁移。" }
+    ]
+  },
+  "components": [
+    { "id": "users", "type": "external", "label": "用户", "sublabel": "PC / 手机浏览器", "pos": [30, 250], "size": [120, 64] },
+    { "id": "host", "type": "cloud", "label": "静态托管", "sublabel": "任意静态服务 / file://", "pos": [190, 250], "size": [140, 64], "tag": "零运维" },
+    { "id": "backup", "type": "external", "label": "JSON 备份文件", "sublabel": "导出 / 导入迁移", "pos": [190, 420], "size": [140, 64] },
+    { "id": "seed", "type": "backend", "label": "种子数据", "sublabel": "STAGES / RES / SPRINT", "pos": [400, 90], "size": [180, 60], "tag": "首屏非空" },
+    { "id": "data", "type": "backend", "label": "数据层", "sublabel": "loadData / saveData", "pos": [400, 250], "size": [180, 64], "tag": "唯一读写点" },
+    { "id": "store", "type": "database", "label": "localStorage", "sublabel": "key: career_ops_v1", "pos": [400, 420], "size": [180, 64] },
+    { "id": "schedule", "type": "backend", "label": "refreshAll()", "sublabel": "唯一刷新入口", "pos": [650, 250], "size": [160, 64], "tag": "DAG 调度" },
+    { "id": "render", "type": "frontend", "label": "渲染层 render*", "sublabel": "8 个视图模块", "pos": [870, 150], "size": [180, 64], "tag": "只写 DOM" },
+    { "id": "canvas", "type": "frontend", "label": "画布引擎 cv*", "sublabel": "布局 / 缩放 / 导出", "pos": [870, 400], "size": [180, 64], "tag": "内联 SVG" }
+  ],
+  "boundaries": [
+    { "kind": "region", "label": "数据层 · 全局唯一读写点", "wraps": ["seed", "data", "store"], "pad": 26 },
+    { "kind": "region", "label": "渲染层 · 只读 state，只写 DOM", "wraps": ["render", "canvas"], "pad": 26 }
+  ],
+  "connections": [
+    { "id": "open", "from": "users", "to": "host", "label": "打开链接", "variant": "emphasis", "labelAt": [170, 328] },
+    { "id": "load-file", "from": "host", "to": "data", "label": "加载单文件" },
+    { "id": "seed-fill", "from": "seed", "to": "data", "label": "首次填充 / 版本迁移", "variant": "dashed", "fromSide": "bottom", "toSide": "top", "labelAt": [490, 164] },
+    { "id": "persist", "from": "data", "to": "store", "label": "JSON 持久化", "variant": "emphasis", "fromSide": "bottom", "toSide": "top", "labelAt": [492, 332] },
+    { "id": "backup-io", "from": "data", "to": "backup", "label": "导出 / 导入 JSON", "variant": "dashed" },
+    { "id": "dispatch", "from": "data", "to": "schedule", "label": "数据变更 → 触发刷新", "variant": "emphasis", "labelAt": [615, 332] },
+    { "id": "call-order", "from": "schedule", "to": "render", "label": "按固定顺序调用", "labelAt": [840, 232] },
+    { "id": "canvas-view", "from": "schedule", "to": "canvas", "label": "画布视图重绘" }
+  ],
+  "cards": [
+    { "dot": "cyan", "title": "分层与单向调用", "items": ["数据层之外的所有层都只读 state", "refreshAll() 是唯一刷新入口，渲染函数之间禁止互调", "调用链构成有向无环图，从架构上杜绝递归环"] },
+    { "dot": "emerald", "title": "零依赖单文件", "items": ["CSS / JS / 图标 / 图表全部内联，无 CDN 与构建步骤", "图表用内联 SVG 手写，不引任何图表库", "可直接 file:// 打开，也可挂任意静态托管"] },
+    { "dot": "amber", "title": "数据安全闭环", "items": ["首次打开预置示例数据，含 1 条逾期态便于验收", "localStorage 持久化，刷新与关窗不丢", "JSON 导出 / 导入承担跨设备迁移与备份"] },
+    { "dot": "violet", "title": "画布引擎", "items": ["拖拽平移、滚轮缩放、节点吸附、双击改字", "拓扑分层 + 蛇形排布，节点零重叠", "一键生成思维导图 / 流程图 / 框图并导出 SVG、PNG"] }
+  ]
+}

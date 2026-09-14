@@ -1,0 +1,254 @@
+{
+  "schema_version": 1,
+  "diagram_type": "dataflow",
+  "meta": {
+    "title": "工作台数据流：从一次点击到落盘",
+    "subtitle": "state 是唯一真相；所有写入都经过数据层，所有输出都经过 refreshAll()",
+    "locale": "zh-CN",
+    "output": "docs/diagrams/dataflow.html",
+    "viewBox": [
+      1075,
+      620
+    ],
+    "animation": "trace",
+    "quality_profile": "showcase",
+    "views": [
+      {
+        "id": "write-path",
+        "label": "写入主路径",
+        "focus": [
+          "input",
+          "dispatch",
+          "state",
+          "compute",
+          "render"
+        ],
+        "note": "点击或提交先进事件委托，改完 state 再统一刷新渲染。"
+      },
+      {
+        "id": "persist-path",
+        "label": "持久化与备份",
+        "focus": [
+          "state",
+          "local",
+          "backup"
+        ],
+        "note": "每次变更都序列化进 localStorage，再可导出为 JSON 文件。"
+      },
+      {
+        "id": "canvas-path",
+        "label": "画布派生路径",
+        "focus": [
+          "state",
+          "canvasengine",
+          "render"
+        ],
+        "note": "画布是 state 的派生视图，布局结果以 SVG 标记回流渲染层。"
+      }
+    ]
+  },
+  "stages": [
+    {
+      "label": "用户输入"
+    },
+    {
+      "label": "事件分发"
+    },
+    {
+      "label": "state 变更"
+    },
+    {
+      "label": "派生与落盘"
+    },
+    {
+      "label": "输出"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "input",
+      "type": "external",
+      "label": "用户操作",
+      "sublabel": "点击 / 输入",
+      "stage": 0,
+      "row": 1,
+      "tag": "唯一入口"
+    },
+    {
+      "id": "dispatch",
+      "type": "backend",
+      "label": "全局事件委托",
+      "sublabel": "data-act → onAction",
+      "stage": 1,
+      "row": 1,
+      "tag": "集中分发"
+    },
+    {
+      "id": "state",
+      "type": "backend",
+      "label": "state 内存对象",
+      "sublabel": "全站唯一真相",
+      "stage": 2,
+      "row": 1,
+      "tag": "只在此写"
+    },
+    {
+      "id": "local",
+      "type": "database",
+      "label": "localStorage",
+      "sublabel": "key: career_ops_v1",
+      "stage": 3,
+      "row": 0,
+      "tag": "自动落盘"
+    },
+    {
+      "id": "compute",
+      "type": "backend",
+      "label": "计算层",
+      "sublabel": "逾期聚合 / 焦点选举",
+      "stage": 3,
+      "row": 1,
+      "tag": "纯函数"
+    },
+    {
+      "id": "canvasengine",
+      "type": "backend",
+      "label": "画布引擎",
+      "sublabel": "分层 / 蛇形排布",
+      "stage": 3,
+      "row": 2,
+      "tag": "布局求解"
+    },
+    {
+      "id": "backup",
+      "type": "external",
+      "label": "JSON 备份文件",
+      "sublabel": "导出 / 导入迁移",
+      "stage": 4,
+      "row": 0,
+      "tag": "可移植"
+    },
+    {
+      "id": "render",
+      "type": "frontend",
+      "label": "渲染层 render*",
+      "sublabel": "8 个模块只写 DOM",
+      "stage": 4,
+      "row": 1,
+      "tag": "不回写"
+    }
+  ],
+  "flows": [
+    {
+      "id": "click",
+      "from": "input",
+      "to": "dispatch",
+      "label": "点击 / 提交",
+      "classification": "用户事件",
+      "variant": "emphasis"
+    },
+    {
+      "id": "mutate",
+      "from": "dispatch",
+      "to": "state",
+      "label": "写入 / 修改",
+      "classification": "唯一写点",
+      "variant": "emphasis"
+    },
+    {
+      "id": "refresh",
+      "from": "state",
+      "to": "compute",
+      "label": "触发刷新",
+      "classification": "读 state",
+      "variant": "emphasis",
+      "route": "straight",
+      "labelAt": [
+        704,
+        214
+      ]
+    },
+    {
+      "id": "aggregate",
+      "from": "compute",
+      "to": "render",
+      "label": "聚合结果",
+      "classification": "派生结果",
+      "variant": "emphasis",
+      "route": "straight",
+      "labelAt": [
+        853,
+        218
+      ]
+    },
+    {
+      "id": "persist",
+      "from": "state",
+      "to": "local",
+      "label": "saveData()",
+      "classification": "每次变更",
+      "variant": "default",
+      "labelSegment": 1,
+      "channelX": 594
+    },
+    {
+      "id": "export",
+      "from": "local",
+      "to": "backup",
+      "label": "导出 JSON",
+      "classification": "跨设备迁移",
+      "variant": "dashed"
+    },
+    {
+      "id": "graph",
+      "from": "state",
+      "to": "canvasengine",
+      "label": "节点与连线",
+      "classification": "画布数据",
+      "variant": "default",
+      "labelSegment": 1,
+      "channelX": 614
+    },
+    {
+      "id": "svg",
+      "from": "canvasengine",
+      "to": "render",
+      "label": "SVG 标记",
+      "classification": "可导出",
+      "variant": "default",
+      "labelAt": [
+        880,
+        330
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "单一写点",
+      "items": [
+        "只有事件处理会改 state，渲染层永远只读",
+        "改完统一走 refreshAll()，不在渲染函数里互相触发",
+        "调用链是 DAG，结构上排除递归环"
+      ]
+    },
+    {
+      "dot": "cyan",
+      "title": "单一刷新入口",
+      "items": [
+        "refreshAll() 按固定顺序调用各 render*",
+        "每个 render* 独立读取最新 state，不依赖调用次序",
+        "视图切换只改 VIEW 变量再走同一条刷新路径"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "容错与降级",
+      "items": [
+        "localStorage 不可用时切换离线提示，页面不崩",
+        "解析失败自动回落到种子数据",
+        "首次打开预置示例，杜绝空白首屏"
+      ]
+    }
+  ]
+}

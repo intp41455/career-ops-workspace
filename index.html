@@ -417,7 +417,7 @@ let state = JSON.parse(JSON.stringify(DEFAULT_DATA));
      ① 新增条目 → 追加（不覆盖用户已勾选的 done / status）
      ② 修订条目 → 按 id 覆盖文案字段，但保留用户的勾选状态
    ===================================================================== */
-const RES_VERSION  = 2;   // 资源包版本
+const RES_VERSION  = 3;   // 资源包版本
 const GOAL_VERSION = 2;   // 目标包版本
 
 /* 按 id 修订：只改展示文案，不改完成状态 */
@@ -612,7 +612,14 @@ function RES_SEED(){
     {id:'r29',stage:'S2 检索', pri:'P2', kind:'GitHub', type:'仓库', title:'datalab-to/marker（PDF→Markdown 高速转换）', by:'Datalab · ★39739 · 2026-09-13 更新', url:'https://github.com/datalab-to/marker', why:'三方案对比里的速度组。用它跑同一份脏数据，记录「正确率 / 耗时 / 表格保留」三项，这张对比表就是你作品集 README 里最亮的一块。', hours:'2h', done:false},
     {id:'r30',stage:'S2 检索', pri:'P2', kind:'GitHub', type:'仓库', title:'PaddlePaddle/PaddleOCR', by:'百度飞桨 · ★89503 · 2026-07-22 更新', url:'https://github.com/PaddlePaddle/PaddleOCR', why:'先确认你自己目前用的 OCR 引擎是不是它。如果是，简历上必须写明「模型名称 + 版本号」——写得出型号的人和写不出的，在面试官眼里是两个层次。', hours:'1h', done:false},
     {id:'r31',stage:'S4 收尾', pri:'P1', kind:'GitHub', type:'仓库', title:'promptfoo/promptfoo（LLM / RAG / Agent 评测）', by:'Promptfoo · ★25092 · 2026-09-14 更新', url:'https://github.com/promptfoo/promptfoo', why:'评测环节的主推工具（详见《学习资源地图-GitHub与B站-v2.2.md》§一）。相比 ragas 活跃度高得多，且支持 CI 集成。简历上「我用 promptfoo 做回归评测」比 ragas 更经得起追问。', hours:'4h', done:false},
-    {id:'r32',stage:'S4 收尾', pri:'P2', kind:'GitHub', type:'仓库', title:'vibrantlabsai/ragas（原 explodinggradients/ragas）', by:'Vibrant Labs · ★15725 · 2026-02-24 后停更', url:'https://github.com/vibrantlabsai/ragas', why:'⚠️ 已改名易手 + 停更 7 个月，不再作为主工具。但仍值得花 1 小时：faithfulness / answer_relevancy 两个指标的「定义口径」仍是业界被引用最多的，面试时你说得出定义就够了。', hours:'1h', done:false}
+    {id:'r32',stage:'S4 收尾', pri:'P2', kind:'GitHub', type:'仓库', title:'vibrantlabsai/ragas（原 explodinggradients/ragas）', by:'Vibrant Labs · ★15725 · 2026-02-24 后停更', url:'https://github.com/vibrantlabsai/ragas', why:'⚠️ 已改名易手 + 停更 7 个月，不再作为主工具。但仍值得花 1 小时：faithfulness / answer_relevancy 两个指标的「定义口径」仍是业界被引用最多的，面试时你说得出定义就够了。', hours:'1h', done:false},
+    {id:'r33',stage:'S3 Agent', pri:'P1', kind:'B站', type:'视频', title:'MCP 终极指南（基础篇）：从原理到实战', by:'2025-04-15', url:'https://www.bilibili.com/video/BV1uronYREWR', why:'G11 入门首选。跟着它跑通第一个 MCP Server：装 Host → 配 API Key → 配 Server → 用 uvx / npx 接现成 Server。23 分钟基础时区讲得很细，照做就能跑起来。', hours:'1h', done:false},
+    {id:'r34',stage:'S3 Agent', pri:'P2', kind:'B站', type:'视频', title:'模型上下文协议（MCP）清晰解释：为什么它很重要', by:'2025-03-15', url:'https://www.bilibili.com/video/BV1siQmYLEQJ', why:'G11 的面试话术来源。它讲的是「为什么要有 MCP」而不是怎么配，看完你能把这个词讲成人话——这才是你真正缺的那一环。', hours:'0.5h', done:false},
+    {id:'r35',stage:'S2 检索', pri:'P1', kind:'B站', type:'视频', title:'RAG 工作机制详解——一个高质量知识库背后的技术全流程', by:'马克的技术工作坊 · 2025-06-21', url:'https://www.bilibili.com/video/BV1JLN2z4EZQ', why:'S2 开课前先看它建立整体骨架（分片 → 索引 → 检索 → 生成）。1 小时不到，能让你后面看主线课时不迷路。', hours:'1h', done:false},
+    {id:'r36',stage:'S3 Agent', pri:'P1', kind:'B站', type:'视频', title:'尚硅谷 · LangChain 实战快速入门', by:'尚硅谷 · 2025-09-16', url:'https://www.bilibili.com/video/BV1ZppNzHEY4', why:'G9 LangChain 正名的低成本版本。时间紧时用它代替黑马那套（r22）——更短，够你讲清 Chain / Agent / Memory / Retriever 四个抽象。', hours:'6h', done:false},
+    {id:'r37',stage:'贯穿', pri:'P2', kind:'B站', type:'视频', title:'【748 集】AI 大模型应用开发体系课（当索引用，别从头看）', by:'2026-04', url:'https://www.bilibili.com/video/BV16aDpB4Er6', why:'⚠️ 300+ 小时，你只有 63 小时——它只能当字典。真要用时直接跳：LangGraph 接入 MCP 看第 67 集、多智能体工作流看 70–71 集、私有化部署看 84–87 集（对应 G16）。', hours:'按需查', done:false},
+    {id:'r38',stage:'S2 检索', pri:'P2', kind:'GitHub', type:'仓库', title:'run-llama/llama_index', by:'LlamaIndex · ★52157 · 2026-09-11 更新', url:'https://github.com/run-llama/llama_index', why:'G17 了解层。不用学，只需能一句话说清「LlamaIndex 偏数据索引与查询，LangChain 偏流程编排，LangGraph 偏有状态的图」——这三个词同时出现在 JD 里，分不清会被追问。', hours:'1h', done:false},
+    {id:'r39',stage:'S4 收尾', pri:'P2', kind:'文档', type:'认证', title:'影刀学院 · RPA 技能认证（初级 / 中级 / 高级）', by:'影刀官方 · 证书官网在线可查', url:'https://beta-college.yingdao.com/', why:'G18 的入口。初级 65 分及格、中高级 75 分，补考不限次不限间隔。你有 Python 自动化基础，初级 1–2 天能拿下。简历只能写「持有影刀 RPA 技能认证（初级）」，别写「精通 RPA」。', hours:'1–2 天', done:false}
   ];
 }
 
@@ -792,7 +799,8 @@ const STAGES = [
   {key:'S1 筑基', name:'S1 · 筑基（服务）', days:'D1–D5', range:'5 天', color:'#2C6E9B', goal:'打通「服务」：能自己写接口、能自己打包部署', focus:'FastAPI + Docker + Redis', tasks:['FastAPI：路由 / Pydantic / 依赖注入 / 异常处理 / 日志','实现文件上传 + 文本切分接口','Dockerfile 多阶段构建，镜像瘦身','docker-compose 把 API + Redis 串起来','Redis 缓存与限流最小 demo','验收：一条 docker-compose up 拉起整套服务']},
   {key:'S2 检索', name:'S2 · 检索（RAG 全链路）', days:'D6–D11', range:'6 天', color:'#2F855A', goal:'打通「检索」：从文档到可回答的问题', focus:'Chroma + 分块 + 混合检索 + 重排', tasks:['文档解析：把 docx/PDF 转成结构化文本（复用你的 docx 引擎）','分块策略实验：固定长 / 递归 / 语义，各跑一组','Chroma 持久化向量库，BGE 中文 embedding','混合检索：BM25 + 向量，各自召回后融合','Rerank 重排序，测 top_k 与阈值影响','验收：分块对比实验结果表 + 召回率前后对比']},
   {key:'S3 Agent', name:'S3 · Agent（工具调用）', days:'D12–D16', range:'5 天', color:'#6B46C1', goal:'打通「Agent」：让模型能调用你的工具', focus:'Function Calling + LangGraph + MCP + Dify', tasks:['Function Calling：把考勤管道包装成一个 tool','LangGraph：reflection / tool-calling 两种图模式','写一个最小 MCP Server（filesystem + 本地数据）','Dify 搭一个可视化工作流，理解企业交付形态','验收：一个能真实跑通的 Agent Demo']},
-  {key:'S4 收尾', name:'S4 · 收尾（评测 + 作品集）', days:'D17–D21', range:'5 天', color:'#993C1D', goal:'把学到的东西变成「能给人看」的资产', focus:'promptfoo 评测 + README + 简历 3.0', tasks:['promptfoo 跑回归评测集（faithfulness / relevancy 指标口径）','把 RAG 项目整理成公开仓库（脱敏）','写 README + 架构图 + 快速开始','简历 3.0 定稿：只写已验证项','验收：GitHub 公开仓库 + 可投递简历']}
+  {key:'S4 收尾', name:'S4 · 收尾（评测 + 作品集）', days:'D17–D21', range:'5 天', color:'#993C1D', goal:'把学到的东西变成「能给人看」的资产', focus:'promptfoo 评测 + README + 简历 3.0', tasks:['promptfoo 跑回归评测集（faithfulness / relevancy 指标口径）','把 RAG 项目整理成公开仓库（脱敏）','写 README + 架构图 + 快速开始','简历 3.0 定稿：只写已验证项',
+     '可选冲刺：影刀 RPA 技能认证（初级）——官网在线可查，1–2 天，时间不够第一个砍','验收：GitHub 公开仓库 + 可投递简历']}
 ];
 
 /* =======================================================================

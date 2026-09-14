@@ -3,9 +3,12 @@
 > 一个**单文件、零依赖、离线可用**的个人求职与学习目标管理工作台。
 > 拖进浏览器就能用，数据留在你自己的设备上。
 
+**🔗 在线使用：<https://intp41455.github.io/career-ops-workspace/>**
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-2DD4BF.svg)](#license)
 [![Single File](https://img.shields.io/badge/build-none%20required-2DD4BF.svg)](#-快速开始)
 [![No Dependencies](https://img.shields.io/badge/dependencies-0-2DD4BF.svg)](#-设计约束)
+[![Live Demo](https://img.shields.io/badge/demo-GitHub%20Pages-2DD4BF.svg)](https://intp41455.github.io/career-ops-workspace/)
 
 ---
 
@@ -17,7 +20,8 @@
 
 > 一个非科班背景的人，如何在有限时间内把已有的项目经验，翻译成面试官能听懂的技术语言，并补齐真正的硬缺口。
 
-**在线预览**：把 `index.html` 直接拖进浏览器，或访问仓库 Pages（若已开启）。
+**在线预览**：直接打开 <https://intp41455.github.io/career-ops-workspace/>（GitHub Pages 托管），
+或把 `index.html` 拖进浏览器本地运行 —— 两者行为完全一致，数据都存在你自己的浏览器里。
 
 > ⚠️ **本仓库内所有个人信息均为虚构示例**（人物「林知远」、城市、院校、公司、项目量化数字皆为演示数据）。
 > 请勿将其当作真实背景资料使用；Fork 后请替换为你自己的内容。
@@ -74,6 +78,24 @@ python -m http.server 8000
 **方式三：部署到静态托管**
 
 由于产物只有一个 HTML 文件，可直接上传到任意静态托管（GitHub Pages / Cloudflare Pages / Netlify / Vercel / 对象存储 / Nginx）。无需构建步骤。
+
+本仓库已开启 **GitHub Pages**（源：`main` 分支 `/` 根目录），线上地址：
+
+```
+https://intp41455.github.io/career-ops-workspace/
+```
+
+Fork 后给自己的仓库开启 Pages 的两种方式：
+
+- **网页操作**：`Settings` → `Pages` → Source 选 `Deploy from a branch` → 分支 `main`、目录 `/` → `Save`
+- **命令行**（需 `repo` 权限的 token）：
+
+  ```bash
+  gh api repos/{owner}/{repo}/pages -X POST \
+    -f 'source[branch]=main' -f 'source[path]=/'
+  ```
+
+> 仓库根目录已放置空文件 `.nojekyll`，用于跳过 Jekyll 处理，确保静态资源按原样发布。
 
 > 📱 **手机上使用**：浏览器打开后 → 分享 → 添加到主屏幕，即可当 App 用。
 

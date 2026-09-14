@@ -1,0 +1,16 @@
+# 统一换行符，避免跨平台 diff 噪音
+* text=auto eol=lf
+
+# 二进制资源不做换行转换
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.ico binary
+*.gif binary
+
+# 生成产物保持原样（改动请改 docs/diagrams/src/*.json 后重新生成）
+docs/diagrams/*.html linguist-generated=true
+
+# 语言统计：Markdown 与 HTML 之外的文件不计入
+docs/diagrams/*.html linguist-documentation=true
